@@ -1,7 +1,7 @@
 ﻿@model IEnumerable<ClinicManagementSystem.Models.LabTest>
 
 @{
-    ViewData["Title"] = "Lab Technician Dashboard";
+    ViewData["Title"] = "Lab Test Management";
     var pendingTests = ViewBag.PendingTests as IEnumerable<ClinicManagementSystem.Models.LabTestPrescription>;
 }
 
@@ -11,252 +11,232 @@
 <div class="container-fluid mt-4">
     <!-- Page Header -->
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="text-primary">
-            <i class="fas fa-flask"></i> Lab Technician Dashboard
-        </h2>
-        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createLabTestModal">
-            <i class="fas fa-plus-circle"></i> Add New Lab Test
-        </button>
-    </div>
-
-    <!-- Summary Cards with View Buttons -->
-    <div class="row mb-4">
-        <div class="col-md-4">
-            <div class="card text-white" style="background-color: grey;">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div>
-                            <h5 class="card-title"><i class="fas fa-vial"></i> Total Lab Tests</h5>
-                            <h2 class="card-text mb-3">@Model.Count()</h2>
-                            <button class="btn btn-light btn-sm view-tests-btn" data-target="availableTests">
-                                <i class="fas fa-eye"></i> View Tests
-                            </button>
-                        </div>
-                        <i class="fas fa-flask fa-3x opacity-50"></i>
-                    </div>
-                </div>
-            </div>
+        <div>
+            <h2 class="text-primary">
+                <i class="fas fa-cogs"></i> Lab Test Management
+            </h2>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="@Url.Action("LabTechDashboard", "LabTechnicians")">Dashboard</a></li>
+                    <li class="breadcrumb-item active">Manage Tests</li>
+                </ol>
+            </nav>
         </div>
-        <div class="col-md-4">
-            <div class="card text-white" style="background-color: grey;">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div>
-                            <h5 class="card-title"><i class="fas fa-clock"></i> Pending Tests</h5>
-                            <h2 class="card-text mb-3">@(pendingTests?.Count(t => t.Status != "Completed") ?? 0)</h2>
-                            <button class="btn btn-light btn-sm view-tests-btn" data-target="pendingTests">
-                                <i class="fas fa-eye"></i> View Pending
-                            </button>
-                        </div>
-                        <i class="fas fa-hourglass-half fa-3x opacity-50"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card text-white" style="background-color: grey;">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div>
-                            <h5 class="card-title"><i class="fas fa-check-circle"></i> Completed Today</h5>
-                            <h2 class="card-text mb-3">
-                                @(pendingTests?.Count(t => t.Status == "Completed" && t.PrescribedDate.Date == DateTime.Today) ?? 0)
-                            </h2>
-                            <button class="btn btn-light btn-sm view-tests-btn" data-target="completedTests">
-                                <i class="fas fa-eye"></i> View Completed
-                            </button>
-                        </div>
-                        <i class="fas fa-calendar-check fa-3x opacity-50"></i>
-                    </div>
-                </div>
-            </div>
+        <div>
+            <a href="@Url.Action("LabTechDashboard", "LabTechnicians")" class="btn btn-info me-2">
+                <i class="fas fa-tachometer-alt"></i> Back to Dashboard
+            </a>
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createLabTestModal">
+                <i class="fas fa-plus-circle"></i> Add New Lab Test
+            </button>
         </div>
     </div>
 
-    <!-- Sections Container (Initially Hidden) -->
-    <div id="sectionsContainer" style="display: none;">
-        <!-- Pending Lab Tests Section -->
-        <div id="pendingTests" class="card shadow mb-4 section-card">
-            <div class="card-header bg-warning text-white d-flex justify-content-between align-items-center">
-                <h5 class="mb-0"><i class="fas fa-clock"></i> Pending Lab Tests</h5>
-                <button class="btn btn-light btn-sm close-section">
-                    <i class="fas fa-times"></i> Close
-                </button>
-            </div>
-            <div class="card-body">
-                @if (pendingTests != null && pendingTests.Any(t => t.Status != "Completed"))
-                {
-                    <div class="table-responsive">
-                        <table class="table table-hover table-striped">
-                            <thead class="table-dark">
-                                <tr>
-                                    <th>Prescription #</th>
-                                    <th>Patient ID</th>
-                                    <th>Test Name</th>
-                                    <th>Quantity</th>
-                                    <th>Prescribed Date</th>
-                                    <th>Status</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var test in pendingTests.Where(t => t.Status != "Completed"))
-                                {
+    <!-- Quick Action Tabs -->
+    <ul class="nav nav-tabs mb-4" id="testTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="pending-tab" data-bs-toggle="tab" data-bs-target="#pending" type="button" role="tab">
+                <i class="fas fa-clock text-warning"></i> Pending Tests
+                <span class="badge bg-warning">@(pendingTests?.Count(t => t.Status != "Completed") ?? 0)</span>
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="completed-tab" data-bs-toggle="tab" data-bs-target="#completed" type="button" role="tab">
+                <i class="fas fa-check-circle text-success"></i> Completed Tests
+                <span class="badge bg-success">@(pendingTests?.Count(t => t.Status == "Completed") ?? 0)</span>
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="available-tab" data-bs-toggle="tab" data-bs-target="#available" type="button" role="tab">
+                <i class="fas fa-vial text-primary"></i> Available Tests
+                <span class="badge bg-primary">@Model.Count()</span>
+            </button>
+        </li>
+    </ul>
+
+    <!-- Tab Content -->
+    <div class="tab-content" id="testTabsContent">
+        <!-- Pending Tests Tab -->
+        <div class="tab-pane fade show active" id="pending" role="tabpanel">
+            <div class="card shadow">
+                <div class="card-header bg-warning text-white">
+                    <h5 class="mb-0"><i class="fas fa-clock"></i> Pending Lab Tests</h5>
+                </div>
+                <div class="card-body">
+                    @if (pendingTests != null && pendingTests.Any(t => t.Status != "Completed"))
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover table-striped">
+                                <thead class="table-dark">
                                     <tr>
-                                        <td><span class="badge bg-secondary">PR-@test.PrescriptionId</span></td>
-                                        <td>@test.PatientId</td>
-                                        <td>@test.TestName</td>
-                                        <td>@test.Quantity</td>
-                                        <td>@test.PrescribedDate.ToString("dd/MM/yyyy")</td>
-                                        <td>
-                                            @if (test.Status == "Pending")
-                                            {
+                                        <th>Prescription #</th>
+                                        <th>Patient ID</th>
+                                        <th>Test Name</th>
+                                        <th>Quantity</th>
+                                        <th>Prescribed Date</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var test in pendingTests.Where(t => t.Status != "Completed"))
+                                    {
+                                        <tr>
+                                            <td><span class="badge bg-secondary">PR-@test.PrescriptionId</span></td>
+                                            <td>@test.PatientId</td>
+                                            <td>@test.TestName</td>
+                                            <td>@test.Quantity</td>
+                                            <td>@test.PrescribedDate.ToString("dd/MM/yyyy")</td>
+                                            <td>
                                                 <span class="badge bg-warning text-dark">Pending</span>
-                                            }
-                                        </td>
-                                        <td>
-                                            <button class="btn btn-sm btn-success addResultBtn"
-                                                    data-bs-toggle="modal"
-                                                    data-bs-target="#addResultModal"
-                                                    data-prescriptionid="@test.PrescriptionId"
-                                                    data-testid="@test.TestId"
-                                                    data-patientid="@test.PatientId"
-                                                    data-testname="@test.TestName"
-                                                    data-quantity="@test.Quantity"
-                                                    title="Add Test Result">
-                                                <i class="fas fa-plus-circle"></i> Add Result
-                                            </button>
-                                        </td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
-                    </div>
-                }
-                else
-                {
-                    <div class="alert alert-success mb-0">
-                        <i class="fas fa-check-circle"></i> No pending lab tests. All tests are completed!
-                    </div>
-                }
+                                            </td>
+                                            <td>
+                                                <button class="btn btn-sm btn-success addResultBtn"
+                                                        data-bs-toggle="modal"
+                                                        data-bs-target="#addResultModal"
+                                                        data-prescriptionid="@test.PrescriptionId"
+                                                        data-testid="@test.TestId"
+                                                        data-patientid="@test.PatientId"
+                                                        data-testname="@test.TestName"
+                                                        data-quantity="@test.Quantity"
+                                                        title="Add Test Result">
+                                                    <i class="fas fa-plus-circle"></i> Add Result
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-success mb-0">
+                            <i class="fas fa-check-circle"></i> No pending lab tests. All tests are completed!
+                        </div>
+                    }
+                </div>
             </div>
         </div>
 
-        <!-- Completed Tests Section -->
-        @if (pendingTests != null && pendingTests.Any(t => t.Status == "Completed"))
-        {
-            <div id="completedTests" class="card shadow mb-4 section-card">
-                <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+        <!-- Completed Tests Tab -->
+        <div class="tab-pane fade" id="completed" role="tabpanel">
+            <div class="card shadow">
+                <div class="card-header bg-success text-white">
                     <h5 class="mb-0"><i class="fas fa-check-circle"></i> Completed Tests</h5>
-                    <button class="btn btn-light btn-sm close-section">
-                        <i class="fas fa-times"></i> Close
-                    </button>
                 </div>
                 <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-hover table-striped">
-                            <thead class="table-dark">
-                                <tr>
-                                    <th>Prescription #</th>
-                                    <th>Patient ID</th>
-                                    <th>Test Name</th>
-                                    <th>Quantity</th>
-                                    <th>Completed Date</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var test in pendingTests.Where(t => t.Status == "Completed"))
-                                {
+                    @if (pendingTests != null && pendingTests.Any(t => t.Status == "Completed"))
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover table-striped">
+                                <thead class="table-dark">
                                     <tr>
-                                        <td><span class="badge bg-secondary">PR-@test.PrescriptionId</span></td>
-                                        <td>@test.PatientId</td>
-                                        <td>@test.TestName</td>
-                                        <td>@test.Quantity</td>
-                                        <td>@test.PrescribedDate.ToString("dd/MM/yyyy")</td>
-                                        <td>
-                                            <button class="btn btn-sm btn-primary generateBillBtn"
-                                                    data-bs-toggle="modal"
-                                                    data-bs-target="#generateBillModal"
-                                                    data-resultid="@test.PrescriptionId"
-                                                    data-testname="@test.TestName"
-                                                    data-quantity="@test.Quantity"
-                                                    title="Generate Bill">
-                                                <i class="fas fa-file-invoice"></i> Generate Bill
-                                            </button>
-                                        </td>
+                                        <th>Prescription #</th>
+                                        <th>Patient ID</th>
+                                        <th>Test Name</th>
+                                        <th>Quantity</th>
+                                        <th>Completed Date</th>
+                                        <th>Actions</th>
                                     </tr>
-                                }
-                            </tbody>
-                        </table>
-                    </div>
+                                </thead>
+                                <tbody>
+                                    @foreach (var test in pendingTests.Where(t => t.Status == "Completed"))
+                                    {
+                                        <tr>
+                                            <td><span class="badge bg-secondary">PR-@test.PrescriptionId</span></td>
+                                            <td>@test.PatientId</td>
+                                            <td>@test.TestName</td>
+                                            <td>@test.Quantity</td>
+                                            <td>@test.PrescribedDate.ToString("dd/MM/yyyy")</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-primary generateBillBtn"
+                                                        data-bs-toggle="modal"
+                                                        data-bs-target="#generateBillModal"
+                                                        data-resultid="@test.PrescriptionId"
+                                                        data-testname="@test.TestName"
+                                                        data-quantity="@test.Quantity"
+                                                        title="Generate Bill">
+                                                    <i class="fas fa-file-invoice"></i> Generate Bill
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-info mb-0">
+                            <i class="fas fa-info-circle"></i> No completed tests yet.
+                        </div>
+                    }
                 </div>
             </div>
-        }
+        </div>
 
-        <!-- Available Lab Tests Section -->
-        <div id="availableTests" class="card shadow mb-4 section-card">
-            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-                <h5 class="mb-0"><i class="fas fa-vial"></i> Available Lab Tests</h5>
-                <button class="btn btn-light btn-sm close-section">
-                    <i class="fas fa-times"></i> Close
-                </button>
-            </div>
-            <div class="card-body">
-                @if (Model.Any())
-                {
-                    <div class="table-responsive">
-                        <table class="table table-hover table-striped">
-                            <thead class="table-dark">
-                                <tr>
-                                    <th>Test ID</th>
-                                    <th>Test Name</th>
-                                    <th>Sample Type</th>
-                                    <th>Normal Range</th>
-                                    <th>Price (₹)</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var item in Model)
-                                {
+        <!-- Available Tests Tab -->
+        <div class="tab-pane fade" id="available" role="tabpanel">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-vial"></i> Available Lab Tests</h5>
+                </div>
+                <div class="card-body">
+                    @if (Model.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover table-striped">
+                                <thead class="table-hover">
                                     <tr>
-                                        <td><span class="badge bg-secondary">@item.TestId</span></td>
-                                        <td>@item.TestName</td>
-                                        <td>@item.SampleType</td>
-                                        <td>@item.NormalRange</td>
-                                        <td>₹ @item.Price.ToString("F2")</td>
-                                        <td>
-                                            <button class="btn btn-sm btn-warning editLabTestBtn"
-                                                    data-bs-toggle="modal"
-                                                    data-bs-target="#editLabTestModal"
-                                                    data-id="@item.TestId"
-                                                    data-testname="@item.TestName"
-                                                    data-price="@item.Price"
-                                                    data-sampletype="@item.SampleType"
-                                                    data-normalrange="@item.NormalRange"
-                                                    title="Edit Test">
-                                                <i class="fas fa-edit"></i> Edit
-                                            </button>
-                                        </td>
+                                        <th>Test No</th>
+                                        <th>Test Name</th>
+                                        <th>Sample Type</th>
+                                        <th>Normal Range</th>
+                                        <th>Price (₹)</th>
+                                        <th>Actions</th>
                                     </tr>
-                                }
-                            </tbody>
-                        </table>
-                    </div>
-                }
-                else
-                {
-                    <div class="alert alert-info mb-0">
-                        <i class="fas fa-info-circle"></i> No lab tests available. Click "Add New Lab Test" to create one.
-                    </div>
-                }
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in Model)
+                                    {
+                                        <tr>
+                                            <td><span class="badge bg-secondary">TNo-@item.TestId</span></td>
+                                            <td>@item.TestName</td>
+                                            <td>@item.SampleType</td>
+                                            <td>@item.NormalRange</td>
+                                            <td>₹ @item.Price.ToString("F2")</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-warning editLabTestBtn"
+                                                        data-bs-toggle="modal"
+                                                        data-bs-target="#editLabTestModal"
+                                                        data-id="@item.TestId"
+                                                        data-testname="@item.TestName"
+                                                        data-price="@item.Price"
+                                                        data-sampletype="@item.SampleType"
+                                                        data-normalrange="@item.NormalRange"
+                                                        title="Edit Test">
+                                                    <i class="fas fa-edit"></i> Edit
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-info mb-0">
+                            <i class="fas fa-info-circle"></i> No lab tests available. Click "Add New Lab Test" to create one.
+                        </div>
+                    }
+                </div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- All modals remain exactly the same - keeping them unchanged -->
 <!-- Create Lab Test Modal -->
 <div class="modal fade" id="createLabTestModal" tabindex="-1" aria-labelledby="createLabTestModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
@@ -453,34 +433,17 @@
 
     <script>
         $(document).ready(function () {
-            // View Tests button click handler
-            $('.view-tests-btn').click(function () {
-                var targetId = $(this).data('target');
+            // Check URL hash and activate corresponding tab
+            var hash = window.location.hash;
+            if (hash) {
+                var tab = hash.replace('#', '') + '-tab';
+                $('#' + tab).tab('show');
+            }
 
-                // Hide all sections first
-                $('.section-card').hide();
-
-                // Show the container if hidden
-                $('#sectionsContainer').show();
-
-                // Show the specific section
-                $('#' + targetId).show();
-
-                // Smooth scroll to the section
-                $('html, body').animate({
-                    scrollTop: $('#' + targetId).offset().top - 20
-                }, 500);
-            });
-
-            // Close section button click handler
-            $('.close-section').click(function () {
-                // Hide the current section
-                $(this).closest('.section-card').hide();
-
-                // If all sections are hidden, hide the container
-                if ($('.section-card:visible').length === 0) {
-                    $('#sectionsContainer').hide();
-                }
+            // Update URL hash when tab changes
+            $('button[data-bs-toggle="tab"]').on('shown.bs.tab', function (e) {
+                var target = $(e.target).attr('data-bs-target');
+                window.location.hash = target.replace('#', '');
             });
 
             // ================= CREATE LAB TEST =================
@@ -797,6 +760,16 @@
             box-shadow: 0 5px 15px rgba(0,0,0,0.2);
         }
 
+    .nav-tabs .nav-link {
+        font-weight: 600;
+        color: #495057;
+    }
+
+        .nav-tabs .nav-link.active {
+            color: #007bff;
+            border-bottom: 3px solid #007bff;
+        }
+
     .modal-header {
         border-bottom: none;
         padding: 1rem 1.5rem;
@@ -845,15 +818,21 @@
         font-size: 0.95rem;
     }
 
-    /* Smooth scrolling */
-    html {
-        scroll-behavior: smooth;
+    /* Breadcrumb */
+    .breadcrumb {
+        background-color: transparent;
+        padding: 0;
+        margin-top: 5px;
     }
 
-    /* Section cards */
-    .section-card {
-        display: none;
+    .breadcrumb-item a {
+        color: #007bff;
+        text-decoration: none;
     }
+
+        .breadcrumb-item a:hover {
+            text-decoration: underline;
+        }
 
     /* Responsive adjustments */
     @@media (max-width: 768px) {

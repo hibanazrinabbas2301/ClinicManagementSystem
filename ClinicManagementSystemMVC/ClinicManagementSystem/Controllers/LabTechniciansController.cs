@@ -14,6 +14,19 @@ namespace ClinicManagementSystem.Controllers
             _labTechnicianService = labTechnicianService;
         }
 
+
+        #region Dashboard View
+
+        public ActionResult LabTechDashboard()
+        {
+            ViewBag.PendingTests = _labTechnicianService.SelectPendingTests();
+            var labTests = _labTechnicianService.SelectAllLabTests().ToList();
+            return View(labTests);
+        }
+
+        #endregion
+
+
         #region Index (Lab Tests + Pending Tests)
 
         public ActionResult Index()
