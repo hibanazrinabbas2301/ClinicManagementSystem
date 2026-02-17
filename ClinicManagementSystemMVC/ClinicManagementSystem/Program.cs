@@ -1,3 +1,6 @@
+using ClinicManagementSystem.Repository;
+using ClinicManagementSystem.Service;
+
 namespace ClinicManagementSystem
 {
     public class Program
@@ -8,6 +11,8 @@ namespace ClinicManagementSystem
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
+            builder.Services.AddScoped<ILabTechnicianRepository, LabTechnicianRepository>();
+            builder.Services.AddScoped<ILabTechnicianService, LabTechnicianService>();
 
             var app = builder.Build();
 
@@ -28,7 +33,7 @@ namespace ClinicManagementSystem
 
             app.MapControllerRoute(
                 name: "default",
-                pattern: "{controller=Home}/{action=Index}/{id?}");
+                pattern: "{controller=LabTechnicians}/{action=Index}/{id?}");
 
             app.Run();
         }
