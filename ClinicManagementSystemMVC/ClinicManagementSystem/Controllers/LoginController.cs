@@ -13,13 +13,14 @@ namespace ClinicManagementSystem.Controllers
             _service = service;
         }
 
-        // GET: Login Page
+        // ✅ GET: Login Page
+        [HttpGet]
         public IActionResult Index()
         {
             return View();
         }
 
-        // POST: Login
+        // ✅ POST: Login Submit
         [HttpPost]
         public IActionResult Login(UserModel model)
         {
@@ -28,15 +29,15 @@ namespace ClinicManagementSystem.Controllers
             if (user == null)
             {
                 ViewBag.Error = "Invalid Username or Password!";
-                return View();
+                return View("Index"); // ✅ Fix
             }
 
-            // Store Session
+            // ✅ Store Session
             HttpContext.Session.SetInt32("StaffId", user.StaffId);
             HttpContext.Session.SetString("RoleName", user.RoleName);
             HttpContext.Session.SetString("UserName", user.Name);
 
-            // Redirect Role Dashboard
+            // ✅ Redirect Role Dashboard
             if (user.RoleName == "Receptionist")
                 return RedirectToAction("Index", "Receptionist");
 
@@ -44,19 +45,20 @@ namespace ClinicManagementSystem.Controllers
                 return RedirectToAction("Index", "Doctor");
 
             if (user.RoleName == "Pharmacist")
-                return RedirectToAction("Index", "Pharmacist");
+                return RedirectToAction("Index", "Home");
 
-            if (user.RoleName == "LabTech")
-                return RedirectToAction("Index", "Lab");
+            if (user.RoleName == "Lab Technician")
+                return RedirectToAction("LabTechDashBoard", "LabTechnicians"); // ✅ Fix
 
-            return RedirectToAction("Login");
+            // Default fallback
+            return RedirectToAction("Index");
         }
 
-        // Logout
+        // ✅ Logout
         public IActionResult Logout()
         {
             HttpContext.Session.Clear();
-            return RedirectToAction("Login");
+            return RedirectToAction("Index"); // ✅ Fix
         }
     }
 }

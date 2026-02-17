@@ -18,6 +18,8 @@ namespace ClinicManagementSystem
                 options.Cookie.HttpOnly = true;
                 options.Cookie.IsEssential = true;
             });
+            builder.Services.AddScoped<ILabTechnicianRepository, LabTechnicianRepository>();
+            builder.Services.AddScoped<ILabTechnicianService, LabTechnicianService>();
 
 
             // ? Dependency Injection
