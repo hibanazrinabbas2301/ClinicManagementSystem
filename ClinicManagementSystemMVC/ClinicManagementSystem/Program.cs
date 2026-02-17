@@ -30,6 +30,15 @@ namespace ClinicManagementSystem
             //Register Receptionist Service
             builder.Services.AddScoped<IReceptionistService, ReceptionistServiceImpl>();
 
+            builder.Services.AddScoped<IPharmacistRepo, PharmacistRepoImpl>();
+            builder.Services.AddScoped<IpharmacistService, PharmacistServiceImpl>();
+
+
+            builder.Services.AddScoped<IPharmacistRepo, PharmacistRepoImpl>();
+            builder.Services.AddScoped<IpharmacistService, PharmacistServiceImpl>();
+
+
+
             var app = builder.Build();
 
 

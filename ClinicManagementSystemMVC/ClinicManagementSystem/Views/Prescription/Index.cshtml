@@ -1,0 +1,147 @@
+﻿@model IEnumerable<dynamic>
+
+@{
+    ViewData["Title"] = "Pending Prescriptions";
+}
+
+<div class="container mt-4">
+
+    <h2 class="mb-4">Pending Prescriptions</h2>
+
+    <table class="table table-bordered table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th>Prescription Id</th>
+                <th>Patient</th>
+                <th>Date</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.PrescriptionId</td>
+                    <td>@item.PatientName</td>
+                    <td>@item.PrescribedDate.ToString("dd-MM-yyyy")</td>
+                    <td>
+                        <button class="btn btn-primary btn-sm viewBtn"
+                                data-id="@item.PrescriptionId">
+                            View
+                        </button>
+
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+</div>
+
+
+<!-- Modal -->
+<div class="modal fade" id="prescriptionModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">Prescription Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Medicine</th>
+                            <th>Quantity</th>
+                            <th>Frequency</th>
+                            <th>Duration</th>
+                        </tr>
+                    </thead>
+                    <tbody id="prescriptionDetailsBody">
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn btn-success"
+                        id="issueBtn"
+                        data-id="">
+                    Issue
+                </button>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+
+            // ==============================
+            // VIEW PRESCRIPTION DETAILS
+            // ==============================
+            $(document).on("click", ".viewBtn", function () {
+
+                var prescriptionId = $(this).data("id");
+
+                // Set Issue button prescription id
+                $("#issueBtn").attr("data-id", prescriptionId);
+
+                $.get("/Prescription/GetPrescriptionDetails",
+                    { id: prescriptionId },
+                    function (data) {
+
+                        $("#prescriptionDetailsBody").empty();
+
+                        $.each(data, function (i, item) {
+
+                            $("#prescriptionDetailsBody").append(
+                                `<tr>
+                                    <td>${item.medicineName}</td>
+                                    <td>${item.quantity}</td>
+                                    <td>${item.frequency}</td>
+                                    <td>${item.durationDays}</td>
+                                </tr>`
+                            );
+                        });
+
+                        $("#prescriptionModal").modal("show");
+                    });
+            });
+
+
+            // ==============================
+            // ISSUE PRESCRIPTION
+            // ==============================
+            $(document).on("click", "#issueBtn", function () {
+
+                var prescriptionId = $(this).attr("data-id");
+
+                $.ajax({
+                    url: "/Prescription/Issue",
+                    type: "POST",
+                    data: { prescriptionId: prescriptionId },
+                    success: function (response) {
+
+                        if (response.success) {
+                            alert("Medicine Issued Successfully!");
+                            location.reload();
+                        }
+                        else {
+                            alert(response.message || "Stock not available");
+                        }
+                    },
+                    error: function () {
+                        alert("Error occurred while issuing medicine.");
+                    }
+                });
+            });
+
+        });
+    </script>
+}

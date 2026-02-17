@@ -44,7 +44,7 @@ namespace ClinicManagementSystem.Controllers
                 return RedirectToAction("Index", "Doctor");
 
             if (user.RoleName == "Pharmacist")
-                return RedirectToAction("Index", "Pharmacy");
+                return RedirectToAction("Index", "Pharmacist");
 
             if (user.RoleName == "LabTech")
                 return RedirectToAction("Index", "Lab");
