@@ -5,31 +5,19 @@ namespace ClinicManagementSystem.Repository
 {
     public interface IPharmacistRepo
     {
-
-        //to list all medicines
-        public IEnumerable<MedicineViewModel> GetAllMedicines();
-
-        //add new medcine  to  the medcine 
+        // Medicine
+        IEnumerable<MedicineViewModel> GetAllMedicines();
         int AddMedicine(AddMedicineViewModel model);
-
-
-        //to get the category of medcine 
         IEnumerable<Category> GetCategories();
+        int UpdateMedicine(UpdateMedicineViewModel model);
 
-        //to edit  the medcine stock 
-        public int UpdateMedicine(UpdateMedicineViewModel model);
-
-        public IEnumerable<PrescriptionViewModel> GetPendingPrescriptions();
-
-
-
-
-        IEnumerable<PrescriptionViewModel> GetPrescriptionDetailsById(int prescriptionId);
+        // Prescription Flow
+        IEnumerable<PendingAppointmentViewModel> GetPendingAppointments();
+        IEnumerable<PrescriptionDetailViewModel> GetPrescriptionDetails(int appointmentId);
+        string IssuePrescription(int appointmentId);
 
 
-        int IssuePrescription(int prescriptionId);
-
-
+        IEnumerable<IssuedMedicineBillViewModel> GetIssuedMedicinesBill();
     }
 
 
