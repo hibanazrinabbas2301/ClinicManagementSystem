@@ -14,7 +14,7 @@ namespace ClinicManagementSystem.Repositories
         }
 
         // =====================================================
-        // ✅ Diagnosis Insert
+        // ✅ Save Diagnosis (Insert)
         // =====================================================
         public void AddDiagnosis(Diagnosis model)
         {
@@ -32,6 +32,38 @@ namespace ClinicManagementSystem.Repositories
 
             con.Open();
             cmd.ExecuteNonQuery();
+        }
+
+        // =====================================================
+        // ✅ NEW: Get Diagnosis by Appointment (Reload Values)
+        // =====================================================
+        public Diagnosis GetDiagnosisByAppointment(int appointmentId)
+        {
+            Diagnosis model = new Diagnosis();
+
+            using SqlConnection con = new SqlConnection(_ConnectionString);
+
+            SqlCommand cmd = new SqlCommand(
+                "SELECT TOP 1 * FROM DiagnosisDetails WHERE AppointmentId=@AppointmentId",
+                con);
+
+            cmd.Parameters.AddWithValue("@AppointmentId", appointmentId);
+
+            con.Open();
+            SqlDataReader dr = cmd.ExecuteReader();
+
+            if (dr.Read())
+            {
+                model.AppointmentId = Convert.ToInt32(dr["AppointmentId"]);
+                model.PatientId = Convert.ToInt32(dr["PatientId"]);
+                model.DoctorId = Convert.ToInt32(dr["DoctorId"]);
+
+                model.Symptoms = dr["Symptoms"].ToString();
+                model.DiagnosisText = dr["Diagnosis"].ToString();
+                model.DoctorNotes = dr["DoctorNotes"].ToString();
+            }
+
+            return model;
         }
 
         // =====================================================
@@ -57,7 +89,7 @@ namespace ClinicManagementSystem.Repositories
         }
 
         // =====================================================
-        // ✅ Get Prescribed Medicines for Appointment
+        // ✅ View Medicines by Appointment
         // =====================================================
         public List<MedicinePrescription> GetMedicinesByAppointment(int appointmentId)
         {
@@ -93,7 +125,7 @@ namespace ClinicManagementSystem.Repositories
         {
             using SqlConnection con = new SqlConnection(_ConnectionString);
 
-            SqlCommand cmd = new SqlCommand("sp_AddLabPrescription", con);
+            SqlCommand cmd = new SqlCommand("sp_AddLabTestPrescription", con);
             cmd.CommandType = CommandType.StoredProcedure;
 
             cmd.Parameters.AddWithValue("@AppointmentId", model.AppointmentId);
@@ -107,7 +139,7 @@ namespace ClinicManagementSystem.Repositories
         }
 
         // =====================================================
-        // ✅ Get Prescribed Lab Tests for Appointment
+        // ✅ View Lab Tests by Appointment
         // =====================================================
         public List<LabPrescription> GetLabTestsByAppointment(int appointmentId)
         {
@@ -218,6 +250,10 @@ namespace ClinicManagementSystem.Repositories
 
             return list;
         }
+
+        // =====================================================
+        // ✅ Patient History FIXED
+        // =====================================================
         public List<Diagnosis> GetPatientHistory(int patientId)
         {
             List<Diagnosis> list = new();
@@ -237,13 +273,18 @@ namespace ClinicManagementSystem.Repositories
                 {
                     Date = Convert.ToDateTime(dr["Date"]),
                     Symptoms = dr["Symptoms"].ToString(),
-                    DiagnosisName = dr["DiagnosisName"].ToString(),
+                    DiagnosisText = dr["DiagnosisText"].ToString(),
                     DoctorNotes = dr["DoctorNotes"].ToString()
                 });
             }
 
             return list;
         }
+
+
+        // =====================================================
+        // ✅ Mark Appointment Completed
+        // =====================================================
         public void MarkAppointmentCompleted(int appointmentId)
         {
             using SqlConnection con = new SqlConnection(_ConnectionString);
@@ -256,10 +297,5 @@ namespace ClinicManagementSystem.Repositories
             con.Open();
             cmd.ExecuteNonQuery();
         }
-
     }
 }
-
-    
-
-

@@ -1,6 +1,7 @@
-﻿using _2026_EMS_Project_new_Batch.Models;
-using _2026_EMS_Project_new_Batch.Repository;
+﻿
 using ClinicManagementSystem.Models;
+using ClinicManagementSystem_Final.Models;
+using ClinicManagementSystem_Final.Repository;
 
 namespace ClinicManagementSystem.Services
 {
@@ -55,7 +56,7 @@ namespace ClinicManagementSystem.Services
                 return _receptionistRepository.GetAllPatients();
             }
 
-            public List<AppointmentViewModel> GetAppointments()
+            public List<ClinicManagementSystem_Final.Models.AppointmentViewModel> GetAppointments()
             {
                 return _receptionistRepository.GetAppointments();
             }
@@ -70,12 +71,12 @@ namespace ClinicManagementSystem.Services
                 return _receptionistRepository.GenerateConsultationBill(patientId, appointmentId, consultationFee);
             }
 
-            public BillViewModel GetConsultationBillDetails(int patientId, int appointmentId)
+            public ClinicManagementSystem_Final.Models.BillViewModel GetConsultationBillDetails(int patientId, int appointmentId)
             {
                 return _receptionistRepository.GetConsultationBillDetails(patientId, appointmentId);
             }
 
-        public List<SlotViewModel> GetAvailableSlots()
+        public List<ClinicManagementSystem_Final.Models.SlotViewModel> GetAvailableSlots()
         {
             return _receptionistRepository.GetAvailableSlots();
         }

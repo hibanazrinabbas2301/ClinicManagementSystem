@@ -1,4 +1,4 @@
-﻿namespace _2026_EMS_Project_new_Batch.Models
+﻿namespace ClinicManagementSystem_Final.Models
 {
     public class RecurringAppointmentModel               //For Paient to book recurring appointments with a doctor (e.g., for regular check-ups or therapy sessions)
     {

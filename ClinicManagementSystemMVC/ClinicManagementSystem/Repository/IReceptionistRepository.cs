@@ -1,7 +1,7 @@
-﻿using _2026_EMS_Project_new_Batch.Models;
-using ClinicManagementSystem.Models;
+﻿using ClinicManagementSystem.Models;
+using ClinicManagementSystem_Final.Models;
 
-namespace _2026_EMS_Project_new_Batch.Repository
+namespace ClinicManagementSystem_Final.Repository
 {
     public interface IReceptionistRepository
     {
@@ -18,7 +18,7 @@ namespace _2026_EMS_Project_new_Batch.Repository
         // Scheduling / Appointments
         List<Doctor> GetAllDoctors();
         List<Patient> GetAllPatients();
-        List<AppointmentViewModel> GetAppointments();
+        List<ClinicManagementSystem_Final.Models.AppointmentViewModel> GetAppointments();
         int BookAppointment(int slotId, int patientId);
         public bool GenerateConsultationBill(int patientId, int appointmentId, decimal fee);
         BillViewModel GetConsultationBillDetails(int patientId, int appointmentId);

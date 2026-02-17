@@ -1,5 +1,5 @@
-﻿using _2026_EMS_Project_new_Batch.Models;
-using ClinicManagementSystem.Models;
+﻿using ClinicManagementSystem.Models;
+using ClinicManagementSystem_Final.Models;
 
 namespace ClinicManagementSystem.Services
 {

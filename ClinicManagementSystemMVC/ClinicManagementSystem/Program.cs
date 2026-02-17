@@ -1,6 +1,6 @@
-using _2026_EMS_Project_new_Batch.Repository;
 using ClinicManagementSystem.Repositories;
 using ClinicManagementSystem.Services;
+using ClinicManagementSystem_Final.Repository;
 
 namespace ClinicManagementSystem
 {

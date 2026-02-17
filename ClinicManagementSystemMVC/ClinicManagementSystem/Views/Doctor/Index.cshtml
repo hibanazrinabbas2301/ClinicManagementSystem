@@ -86,7 +86,13 @@ else
 
                     <!-- Action -->
                     <td>
-                        @if (item.Status == "Upcoming")
+                        @if (item.Status == "Completed")
+                        {
+                            <button class="btn btn-success btn-sm" disabled>
+                                ✅ Consulted
+                            </button>
+                        }
+                        else if (item.Status == "Upcoming")
                         {
                             <a class="btn btn-primary btn-sm"
                                asp-action="Consultation"
@@ -95,18 +101,13 @@ else
                                 Consult
                             </a>
                         }
-                        else if (item.Status == "Completed")
-                        {
-                            <button class="btn btn-success btn-sm" disabled>
-                                ✅ Consulted
-                            </button>
-                        }
                         else
                         {
                             <button class="btn btn-secondary btn-sm" disabled>
                                 Expired
                             </button>
                         }
+
 
                     </td>
                 </tr>

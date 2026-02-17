@@ -1,6 +1,7 @@
-﻿using _2026_EMS_Project_new_Batch.Models;
-using _2026_EMS_Project_new_Batch.Repository;
+﻿
 using ClinicManagementSystem.Models;
+using ClinicManagementSystem_Final.Models;
+using ClinicManagementSystem_Final.Repository;
 using Microsoft.Data.SqlClient;
 using System.Data;
 
@@ -58,15 +59,15 @@ namespace ClinicManagementSystem.Repositories
                     cmd.CommandType = CommandType.StoredProcedure;
 
                     cmd.Parameters.AddWithValue("@MMRNo", patient.MMRNo);
-                    cmd.Parameters.AddWithValue("@Name", patient.PatientName);
+                    cmd.Parameters.AddWithValue("@PatientName", patient.PatientName);
                     cmd.Parameters.AddWithValue("@Gender", patient.Gender);
                     cmd.Parameters.AddWithValue("@DOB", patient.DOB);
-                    cmd.Parameters.AddWithValue("@Phone", patient.ContactNumber);
+                    cmd.Parameters.AddWithValue("@ContactNumber", patient.ContactNumber);
                     cmd.Parameters.AddWithValue("@Address", patient.Address);
-
                     // Optional parameters
-                    cmd.Parameters.AddWithValue("@BloodGroup", string.IsNullOrEmpty(patient.BloodGroup) ? DBNull.Value : patient.BloodGroup);
-                    cmd.Parameters.AddWithValue("@Status", string.IsNullOrEmpty(patient.Status) ? "Active" : patient.Status);
+                    cmd.Parameters.AddWithValue("@BloodGroup", string.IsNullOrEmpty(patient.BloodGroup) ? (object)DBNull.Value : patient.BloodGroup);
+                    cmd.Parameters.AddWithValue("@Email", (object?)patient.Email ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@Status", patient.Status ?? "Active");
 
                     con.Open();
                     cmd.ExecuteNonQuery();

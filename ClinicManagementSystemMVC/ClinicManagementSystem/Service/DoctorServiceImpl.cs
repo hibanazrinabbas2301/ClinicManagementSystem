@@ -11,9 +11,45 @@ namespace ClinicManagementSystem.Services
         {
             _repo = repo;
         }
+
+        // ===============================
+        // Diagnosis
+        // ===============================
         public void AddDiagnosis(Diagnosis model)
         {
-              _repo.AddDiagnosis(model);
+            _repo.AddDiagnosis(model);
+        }
+
+        // ✅ NEW: Load Diagnosis for Consultation Page
+        public Diagnosis GetDiagnosisByAppointment(int appointmentId)
+        {
+            return _repo.GetDiagnosisByAppointment(appointmentId);
+        }
+
+        // ===============================
+        // Medicine Prescription
+        // ===============================
+        public List<Medicine> GetMedicines()
+        {
+            return _repo.GetMedicines();
+        }
+
+        public void AddMedicinePrescription(MedicinePrescription model)
+        {
+            _repo.AddMedicinePrescription(model);
+        }
+
+        public List<MedicinePrescription> GetMedicinesByAppointment(int appointmentId)
+        {
+            return _repo.GetMedicinesByAppointment(appointmentId);
+        }
+
+        // ===============================
+        // Lab Prescription
+        // ===============================
+        public List<LabTest> GetLabTests()
+        {
+            return _repo.GetLabTests();
         }
 
         public void AddLabPrescription(LabPrescription model)
@@ -21,47 +57,33 @@ namespace ClinicManagementSystem.Services
             _repo.AddLabPrescription(model);
         }
 
-        public void AddMedicinePrescription(MedicinePrescription model)
-        {
-            _repo.AddMedicinePrescription(model);
-
-        }
-
-        public List<LabTest> GetLabTests()
-        {
-            return _repo.GetLabTests();
-        }
-
-        public List<Medicine> GetMedicines()
-        {
-            return _repo.GetMedicines();
-
-        }
-
-        public List<Appointment> GetTodaysAppointments(int doctorId)
-        {
-            return _repo.GetTodaysAppointments(doctorId);
-
-        }
-        public List<MedicinePrescription> GetMedicinesByAppointment(int appointmentId)
-        {
-            return _repo.GetMedicinesByAppointment(appointmentId);
-        }
-
         public List<LabPrescription> GetLabTestsByAppointment(int appointmentId)
         {
             return _repo.GetLabTestsByAppointment(appointmentId);
         }
+
+        // ===============================
+        // Patient History
+        // ===============================
         public List<Diagnosis> GetPatientHistory(int patientId)
         {
             return _repo.GetPatientHistory(patientId);
         }
+
+        // ===============================
+        // Appointment Completion
+        // ===============================
         public void MarkAppointmentCompleted(int appointmentId)
         {
             _repo.MarkAppointmentCompleted(appointmentId);
         }
 
-
-
+        // ===============================
+        // Dashboard
+        // ===============================
+        public List<Appointment> GetTodaysAppointments(int doctorId)
+        {
+            return _repo.GetTodaysAppointments(doctorId);
+        }
     }
 }

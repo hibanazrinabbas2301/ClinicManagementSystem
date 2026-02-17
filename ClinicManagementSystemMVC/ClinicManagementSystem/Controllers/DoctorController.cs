@@ -13,9 +13,9 @@ namespace ClinicManagementSystem.Controllers
             _service = service;
         }
 
-        // =====================================================
-        // ✅ 1. Doctor Dashboard (Today's Appointments)
-        // =====================================================
+        // ===============================
+        // ✅ 1. Doctor Dashboard
+        // ===============================
         public IActionResult Index()
         {
             int doctorId = Convert.ToInt32(HttpContext.Session.GetInt32("StaffId"));
@@ -25,41 +25,47 @@ namespace ClinicManagementSystem.Controllers
             return View(appointments);
         }
 
-        // =====================================================
+        // ===============================
         // ✅ 2. Consultation Page (Per Patient)
-        // =====================================================
+        // ===============================
         public IActionResult Consultation(int appointmentId, int patientId)
         {
             // Dropdown Data
             ViewBag.Medicines = _service.GetMedicines();
             ViewBag.LabTests = _service.GetLabTests();
 
-            // Already Added Medicines & Lab Tests
+            // Prescriptions Already Added
             ViewBag.MedicineList = _service.GetMedicinesByAppointment(appointmentId);
             ViewBag.LabList = _service.GetLabTestsByAppointment(appointmentId);
 
-            // Patient Consultation History
+            // Patient History
             ViewBag.History = _service.GetPatientHistory(patientId);
 
-            // Diagnosis Model for Form Binding
-            Diagnosis model = new Diagnosis()
+            // ✅ Load Existing Diagnosis (if already saved)
+            Diagnosis model = _service.GetDiagnosisByAppointment(appointmentId);
+
+            // If no diagnosis exists yet → create empty model
+            if (model.AppointmentId == 0)
             {
-                AppointmentId = appointmentId,
-                PatientId = patientId
-            };
+                model = new Diagnosis()
+                {
+                    AppointmentId = appointmentId,
+                    PatientId = patientId
+                };
+            }
 
             return View(model);
         }
 
-        // =====================================================
-        // ✅ 3. Save Diagnosis + Consultation Notes
-        // =====================================================
+        // ===============================
+        // ✅ 3. Save Diagnosis Draft
+        // ===============================
         [HttpPost]
         public IActionResult AddDiagnosis(Diagnosis model)
         {
             if (!ModelState.IsValid)
             {
-                TempData["Error"] = "Please fill consultation details properly!";
+                TempData["Error"] = "⚠ Please fill all Diagnosis fields!";
                 return RedirectToAction("Consultation",
                     new { appointmentId = model.AppointmentId, patientId = model.PatientId });
             }
@@ -68,15 +74,15 @@ namespace ClinicManagementSystem.Controllers
 
             _service.AddDiagnosis(model);
 
-            TempData["Success"] = "✅ Consultation Details Saved Successfully!";
+            TempData["Success"] = "✅ Diagnosis Saved Successfully!";
 
             return RedirectToAction("Consultation",
                 new { appointmentId = model.AppointmentId, patientId = model.PatientId });
         }
 
-        // =====================================================
-        // ✅ 4. Add Medicine Prescription (Multiple Allowed)
-        // =====================================================
+        // ===============================
+        // ✅ 4. Add Medicine (Multiple Allowed)
+        // ===============================
         [HttpPost]
         public IActionResult AddMedicinePrescription(MedicinePrescription model)
         {
@@ -97,9 +103,9 @@ namespace ClinicManagementSystem.Controllers
                 new { appointmentId = model.AppointmentId, patientId = model.PatientId });
         }
 
-        // =====================================================
-        // ✅ 5. Add Lab Test Prescription (Multiple Allowed)
-        // =====================================================
+        // ===============================
+        // ✅ 5. Add Lab Test (Multiple Allowed)
+        // ===============================
         [HttpPost]
         public IActionResult AddLabPrescription(LabPrescription model)
         {
@@ -119,22 +125,19 @@ namespace ClinicManagementSystem.Controllers
             return RedirectToAction("Consultation",
                 new { appointmentId = model.AppointmentId, patientId = model.PatientId });
         }
+
+        // ===============================
+        // ✅ 6. FINAL COMPLETE CONSULTATION
+        // ===============================
         [HttpPost]
-        public IActionResult FinalSaveConsultation(Diagnosis model)
+        public IActionResult FinalSaveConsultation(int appointmentId, int patientId)
         {
-            model.DoctorId = Convert.ToInt32(HttpContext.Session.GetInt32("StaffId"));
+            // ✅ Mark appointment completed
+            _service.MarkAppointmentCompleted(appointmentId);
 
-            // 1. Save Diagnosis
-            _service.AddDiagnosis(model);
-
-            // 2. Mark Appointment Completed
-            _service.MarkAppointmentCompleted(model.AppointmentId);
-
-            TempData["Success"] = "Consultation Completed Successfully!";
+            TempData["Success"] = "✅ Consultation Completed Successfully!";
 
             return RedirectToAction("Index");
         }
-
-
     }
 }
