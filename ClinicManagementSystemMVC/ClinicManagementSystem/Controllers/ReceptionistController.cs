@@ -1,7 +1,6 @@
-﻿using _2026_EMS_Project_new_Batch.Models;
-using _2026_EMS_Project_new_Batch.Models;
-using _2026_EMS_Project_new_Batch.Repository;
-using _2026_EMS_Project_new_Batch.Service;
+﻿using ClinicManagementSystem_Final.Models;
+using ClinicManagementSystem_Final.Repository;
+using ClinicManagementSystem_Final.Service;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ClinicManagementSystem_Final.Controllers
@@ -46,27 +45,29 @@ namespace ClinicManagementSystem_Final.Controllers
             return View(patient);
         }
 
-        // Add new patient (GET)
-        public IActionResult AddPatient()
-        {
-            return View();
-        }
+        //// Add new patient (GET)
+        //public IActionResult AddPatient()
+        //{
+        //    return View();
+        //}
 
         // Add new patient (POST)
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult AddPatient(Patient patient)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                _receptionistService.AddPatient(patient);
-                TempData["SuccessMessage"] = "Patient added successfully!";
-                return RedirectToAction(nameof(Patients));
+                TempData["ErrorMessage"] = "Please correct the errors and try again.";
+
+                var patients = _receptionistService.GetAllPatients();
+                return View("Patients", patients); // show same page WITH errors
             }
-            TempData["ErrorMessage"] = "Failed to add patient.";
+
+            _receptionistService.AddPatient(patient);
+            TempData["SuccessMessage"] = "Patient added successfully!";
             return RedirectToAction(nameof(Patients));
         }
-
         // Update patient (GET)
         public IActionResult EditPatient(int id)
         {
@@ -80,13 +81,15 @@ namespace ClinicManagementSystem_Final.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult EditPatient(Patient patient)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                _receptionistService.UpdatePatient(patient);
-                TempData["SuccessMessage"] = "Patient updated successfully!";
-                return RedirectToAction(nameof(Patients));
+                TempData["ErrorMessage"] = "Please correct the errors and try again.";
+                var patients = _receptionistService.GetAllPatients();
+                return View("Patients", patients);
             }
-            TempData["ErrorMessage"] = "Failed to update patient.";
+
+            _receptionistService.UpdatePatient(patient);
+            TempData["SuccessMessage"] = "Patient updated successfully!";
             return RedirectToAction(nameof(Patients));
         }
 

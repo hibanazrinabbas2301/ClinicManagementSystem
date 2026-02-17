@@ -1,7 +1,7 @@
-﻿using _2026_EMS_Project_new_Batch.Models;
-using _2026_EMS_Project_new_Batch.Repository;
+﻿using ClinicManagementSystem_Final.Models;
+using ClinicManagementSystem_Final.Repository;
 
-namespace _2026_EMS_Project_new_Batch.Service
+namespace ClinicManagementSystem_Final.Service
 {
     public class ReceptionistServiceImpl : IReceptionistService
         {

@@ -1,6 +1,6 @@
-﻿using _2026_EMS_Project_new_Batch.Models;
+﻿using ClinicManagementSystem_Final.Models;
 
-namespace _2026_EMS_Project_new_Batch.Repository
+namespace ClinicManagementSystem_Final.Repository
 {
     public interface IReceptionistRepository
     {
