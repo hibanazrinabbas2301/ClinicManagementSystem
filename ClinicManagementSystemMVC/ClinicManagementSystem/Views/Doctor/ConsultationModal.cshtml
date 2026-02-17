@@ -1,0 +1,146 @@
+﻿@model ClinicManagementSystem.Models.Diagnosis
+
+<div class="modal fade" id="consultModal" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+
+            <!-- Header -->
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">👨‍⚕️ Consultation Form</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <!-- BODY -->
+            <div class="modal-body">
+
+                <!-- ============================= -->
+                <!-- ✅ SECTION 1: Diagnosis Form -->
+                <!-- ============================= -->
+                <h5 class="text-success mb-3">📝 Consultation Details</h5>
+
+                <form asp-action="AddDiagnosis" method="post">
+
+                    <input asp-for="AppointmentId" type="hidden" id="AppointmentId" />
+                    <input asp-for="PatientId" type="hidden" id="PatientId" />
+
+                    <label>Symptoms</label>
+                    <textarea asp-for="Symptoms" class="form-control mb-2"></textarea>
+
+                    <label>Diagnosis</label>
+                    <textarea asp-for="DiagnosisText" class="form-control mb-2"></textarea>
+
+                    <label>Doctor Notes</label>
+                    <textarea asp-for="DoctorNotes" class="form-control mb-3"></textarea>
+
+                    <button type="submit" class="btn btn-success">
+                        ✅ Save Consultation
+                    </button>
+                </form>
+
+                <hr />
+
+                <!-- ============================= -->
+                <!-- ✅ SECTION 2: Medicine Prescription -->
+                <!-- ============================= -->
+                <h5 class="text-primary mt-3">💊 Prescribe Medicines</h5>
+
+                <form asp-action="AddMedicinePrescription" method="post">
+
+                    <input type="hidden" name="AppointmentId" id="MedAppointmentId" />
+                    <input type="hidden" name="PatientId" id="MedPatientId" />
+
+                    <label>Select Medicine</label>
+                    <select name="MedicineId" class="form-control mb-2">
+                        <option value="">-- Select Medicine --</option>
+
+                        @foreach (var med in ViewBag.Medicines)
+                        {
+                            <option value="@med.MedicineId">
+                                @med.MedicineName
+                            </option>
+                        }
+                    </select>
+
+                    <label>Quantity</label>
+                    <input type="number" name="Quantity" class="form-control mb-2" />
+
+                    <label>Frequency</label>
+                    <input type="text" name="Frequency"
+                           placeholder="Eg: Morning & Night"
+                           class="form-control mb-2" />
+
+                    <label>Duration (Days)</label>
+                    <input type="number" name="DurationDays" class="form-control mb-3" />
+
+                    <button type="submit" class="btn btn-primary">
+                        ➕ Add Medicine
+                    </button>
+                </form>
+
+                <hr />
+
+                <!-- ============================= -->
+                <!-- ✅ SECTION 3: Lab Test Prescription -->
+                <!-- ============================= -->
+                <h5 class="text-danger mt-3">🧪 Prescribe Lab Tests</h5>
+
+                <form asp-action="AddLabPrescription" method="post">
+
+                    <input type="hidden" name="AppointmentId" id="LabAppointmentId" />
+                    <input type="hidden" name="PatientId" id="LabPatientId" />
+
+                    <label>Select Lab Test</label>
+                    <select name="TestId" class="form-control mb-2">
+                        <option value="">-- Select Test --</option>
+
+                        @foreach (var test in ViewBag.LabTests)
+                        {
+                            <option value="@test.TestId">
+                                @test.TestName
+                            </option>
+                        }
+                    </select>
+
+                    <label>Quantity</label>
+                    <input type="number" name="Quantity" class="form-control mb-3" />
+
+                    <button type="submit" class="btn btn-danger">
+                        ➕ Add Lab Test
+                    </button>
+                </form>
+
+            </div>
+
+            <!-- Footer -->
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal">
+                    Close
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- ============================= -->
+<!-- ✅ JAVASCRIPT: Load Appointment -->
+<!-- ============================= -->
+<script>
+    function loadAppointment(appId, patientId) {
+
+        // Diagnosis
+        document.getElementById("AppointmentId").value = appId;
+        document.getElementById("PatientId").value = patientId;
+
+        // Medicine Form
+        document.getElementById("MedAppointmentId").value = appId;
+        document.getElementById("MedPatientId").value = patientId;
+
+        // Lab Form
+        document.getElementById("LabAppointmentId").value = appId;
+        document.getElementById("LabPatientId").value = patientId;
+
+        console.log("Loaded Appointment:", appId);
+        console.log("Loaded Patient:", patientId);
+    }
+</script>

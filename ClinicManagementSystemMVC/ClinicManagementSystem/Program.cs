@@ -1,3 +1,6 @@
+using ClinicManagementSystem.Repositories;
+using ClinicManagementSystem.Services;
+
 namespace ClinicManagementSystem
 {
     public class Program
@@ -6,29 +9,38 @@ namespace ClinicManagementSystem
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
             builder.Services.AddControllersWithViews();
 
-            var app = builder.Build();
+            // ? Dependency Injection
+            builder.Services.AddScoped<IUserRepo, UserRepoImpl>();
+            builder.Services.AddScoped<IUserService, UserServiceImpl>();
+            builder.Services.AddScoped<IDoctorRepository, DoctorRepositoryImpl>();
+            builder.Services.AddScoped<IDoctorService, DoctorServiceImpl>();
 
-            // Configure the HTTP request pipeline.
-            if (!app.Environment.IsDevelopment())
+
+            // ? Enable Session Properly
+            builder.Services.AddSession(options =>
             {
-                app.UseExceptionHandler("/Home/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-                app.UseHsts();
-            }
+                options.IdleTimeout = TimeSpan.FromMinutes(30);
+                options.Cookie.HttpOnly = true;
+                options.Cookie.IsEssential = true;
+            });
+
+            var app = builder.Build();
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 
             app.UseRouting();
 
+            // ? Session MUST be here
+            app.UseSession();
+
             app.UseAuthorization();
 
             app.MapControllerRoute(
                 name: "default",
-                pattern: "{controller=Home}/{action=Index}/{id?}");
+                pattern: "{controller=Login}/{action=Index}/{id?}");
 
             app.Run();
         }

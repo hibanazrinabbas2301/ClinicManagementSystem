@@ -1,0 +1,67 @@
+﻿<div class="modal fade" id="medicineModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <div class="modal-header bg-warning">
+                <h5 class="modal-title">💊 Prescribe Medicine</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <form asp-action="AddMedicinePrescription" method="post">
+                <div class="modal-body">
+
+                    <!-- Appointment + Patient Hidden -->
+                    <input type="hidden" id="MedAppointmentId" name="AppointmentId" />
+                    <input type="hidden" id="MedPatientId" name="PatientId" />
+
+                    <!-- Medicine Dropdown -->
+                    <label>Select Medicine</label>
+                    <select name="MedicineId" class="form-control" required>
+                        @foreach (var med in ViewBag.Medicines)
+                        {
+                            <option value="@med.MedicineId">@med.MedicineName</option>
+                        }
+                    </select>
+
+                    <br />
+
+                    <!-- Quantity -->
+                    <label>Quantity</label>
+                    <input type="number" name="Quantity" class="form-control" required />
+
+                    <br />
+
+                    <!-- Frequency -->
+                    <label>Frequency</label>
+                    <input type="text" name="Frequency" class="form-control"
+                           placeholder="Eg: 2 times/day" required />
+
+                    <br />
+
+                    <!-- Duration -->
+                    <label>Duration (Days)</label>
+                    <input type="number" name="DurationDays" class="form-control" required />
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success">
+                        Add Medicine
+                    </button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    // Copy Patient + Appointment values from Consultation Modal
+    document.getElementById("medicineModal").addEventListener("show.bs.modal", function () {
+        document.getElementById("MedAppointmentId").value =
+            document.getElementById("AppointmentId").value;
+
+        document.getElementById("MedPatientId").value =
+            document.getElementById("PatientId").value;
+    });
+</script>
