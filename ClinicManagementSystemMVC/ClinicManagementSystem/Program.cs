@@ -16,6 +16,11 @@ namespace ClinicManagementSystem
             builder.Services.AddScoped<IpharmacistService, PharmacistServiceImpl>();
 
 
+            builder.Services.AddScoped<IPharmacistRepo, PharmacistRepoImpl>();
+            builder.Services.AddScoped<IpharmacistService, PharmacistServiceImpl>();
+
+
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -35,7 +40,7 @@ namespace ClinicManagementSystem
 
             app.MapControllerRoute(
                 name: "default",
-                pattern: "{controller=Pharmacist}/{action=Index}/{id?}");
+                pattern: "{controller=Home}/{action=Index}/{id?}");
 
             app.Run();
         }

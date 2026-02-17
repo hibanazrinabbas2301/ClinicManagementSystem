@@ -23,7 +23,6 @@ namespace ClinicManagementSystem.Controllers
 
 
         [HttpPost]
-        [HttpPost]
         public IActionResult Index(AddMedicineViewModel model)
         {
             if (!ModelState.IsValid)
@@ -32,6 +31,11 @@ namespace ClinicManagementSystem.Controllers
             }
 
             int newId = _pharmacistService.AddMedicine(model);
+
+            var category = _pharmacistService
+                    .GetCategories()
+                    .FirstOrDefault(c => c.CategoryId == model.CategoryId);
+
 
             return Json(new
             {
@@ -44,6 +48,48 @@ namespace ClinicManagementSystem.Controllers
                 price = model.Price
             });
         }
+
+
+        [HttpGet]
+        public IActionResult GetCategories()
+        {
+            var categories = _pharmacistService.GetCategories();
+            return Json(categories);
+        }
+
+        //edit medcine stock
+        [HttpPost]
+        public IActionResult UpdateMedicine(UpdateMedicineViewModel model)
+        {
+            if (!ModelState.IsValid)
+                return Json(new { success = false });
+
+            try
+            {
+                _pharmacistService.UpdateMedicine(model);
+
+                return Json(new
+                {
+                    success = true,
+                    message="Medicine updated successfully",
+                    name = model.MedicineName,
+                    description = model.MedicineDescription,
+                    addedStock = model.AddedQuantity,
+                    price = model.NewPrice,
+                    expiry = model.NewExpiry
+                });
+            }
+            catch (Exception)
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "Update failed. Please try again."
+                });
+            }
+        }
+
+
 
 
     }

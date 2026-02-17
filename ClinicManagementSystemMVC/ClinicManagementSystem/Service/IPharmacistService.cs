@@ -1,4 +1,7 @@
-﻿using ClinicManagementSystem.ViewModel;
+﻿using ClinicManagementSystem.Models;
+using ClinicManagementSystem.Repository;
+using ClinicManagementSystem.ViewModel;
+using System.Collections.Generic;
 
 namespace ClinicManagementSystem.Service
 {
@@ -9,6 +12,36 @@ namespace ClinicManagementSystem.Service
 
         //add new medcine 
         int AddMedicine(AddMedicineViewModel model);
+
+        //category 
+        IEnumerable<Category> GetCategories();
+
+        //edit medcine stock
+
+        public int UpdateMedicine(UpdateMedicineViewModel model);
+
+
+        public IEnumerable<PrescriptionViewModel> GetPendingPrescriptions();
+
+
+        IEnumerable<PrescriptionViewModel> GetPrescriptionDetailsById(int prescriptionId);
+
+
+
+        int IssuePrescription(int prescriptionId);
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

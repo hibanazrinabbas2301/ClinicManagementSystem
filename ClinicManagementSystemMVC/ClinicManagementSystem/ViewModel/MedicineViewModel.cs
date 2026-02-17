@@ -10,6 +10,9 @@
 
         public string CategoryName { get; set; }
 
+        public int CategoryId { get; set; }
+
+
         public int CurrentStock { get; set; }
 
         public DateTime ExpiryDate { get; set; }

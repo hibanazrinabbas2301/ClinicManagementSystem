@@ -1,4 +1,5 @@
-﻿using ClinicManagementSystem.Repository;
+﻿using ClinicManagementSystem.Models;
+using ClinicManagementSystem.Repository;
 using ClinicManagementSystem.ViewModel;
 
 namespace ClinicManagementSystem.Service
@@ -21,6 +22,39 @@ namespace ClinicManagementSystem.Service
         {
             return _pharmacistRepo.AddMedicine(model);
         }
+
+
+        public IEnumerable<Category> GetCategories()
+        {
+            return _pharmacistRepo.GetCategories();
+        }
+
+
+        public int UpdateMedicine(UpdateMedicineViewModel model)
+        {
+            return _pharmacistRepo.UpdateMedicine(model);
+        }
+
+
+        public IEnumerable<PrescriptionViewModel> GetPendingPrescriptions()
+        {
+            return _pharmacistRepo.GetPendingPrescriptions();
+        }
+
+
+        public IEnumerable<PrescriptionViewModel> GetPrescriptionDetailsById(int prescriptionId)
+        {
+            return _pharmacistRepo.GetPrescriptionDetailsById(prescriptionId);
+        }
+
+
+
+        public int IssuePrescription(int prescriptionId)
+        {
+            return _pharmacistRepo.IssuePrescription(prescriptionId);
+        }
+
+
 
     }
 
