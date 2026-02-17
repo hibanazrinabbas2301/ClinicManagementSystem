@@ -1,5 +1,6 @@
 using _2026_EMS_Project_new_Batch.Repository;
-using _2026_EMS_Project_new_Batch.Service;
+using ClinicManagementSystem.Repositories;
+using ClinicManagementSystem.Services;
 
 namespace ClinicManagementSystem
 {
@@ -9,9 +10,21 @@ namespace ClinicManagementSystem
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
             builder.Services.AddControllersWithViews();
+            // ? Enable Session Properly
+            builder.Services.AddSession(options =>
+            {
+                options.IdleTimeout = TimeSpan.FromMinutes(30);
+                options.Cookie.HttpOnly = true;
+                options.Cookie.IsEssential = true;
+            });
 
+
+            // ? Dependency Injection
+            builder.Services.AddScoped<IUserRepo, UserRepoImpl>();
+            builder.Services.AddScoped<IUserService, UserServiceImpl>();
+            builder.Services.AddScoped<IDoctorRepository, DoctorRepositoryImpl>();
+            builder.Services.AddScoped<IDoctorService, DoctorServiceImpl>();
             // Register Receptionist Repository
             builder.Services.AddScoped<IReceptionistRepository, ReceptionistRepositoryImpl>();
             //Register Receptionist Service
@@ -19,24 +32,23 @@ namespace ClinicManagementSystem
 
             var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
-            if (!app.Environment.IsDevelopment())
-            {
-                app.UseExceptionHandler("/Home/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-                app.UseHsts();
-            }
+
+            
+            
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 
             app.UseRouting();
 
+            // ? Session MUST be here
+            app.UseSession();
+
             app.UseAuthorization();
 
             app.MapControllerRoute(
                 name: "default",
-                pattern: "{controller=Receptionist}/{action=Index}/{id?}");
+                pattern: "{controller=Login}/{action=Index}/{id?}");
 
             app.Run();
         }

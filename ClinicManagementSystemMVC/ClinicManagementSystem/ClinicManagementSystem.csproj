@@ -7,7 +7,20 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <!-- Keep latest SqlClient version -->
     <PackageReference Include="Microsoft.Data.SqlClient" Version="6.1.4" />
+
+    <!-- Needed for scaffolding/controllers/views generation -->
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.23" />
+
+    <!-- Remove if not required, Microsoft.Data.SqlClient is preferred -->
+    <!-- <PackageReference Include="System.Data.SqlClient" Version="4.8.6" /> -->
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="ClassLibraryDataBaseConnection">
+      <HintPath>..\..\..\Users\hiban\Downloads\ClassLibraryADOConnectiion\ClassLibraryDataBaseConnection\obj\Debug\net8.0\ClassLibraryDataBaseConnection.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>

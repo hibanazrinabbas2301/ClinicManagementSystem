@@ -1,8 +1,9 @@
 ﻿using _2026_EMS_Project_new_Batch.Models;
+using ClinicManagementSystem.Models;
 
-namespace _2026_EMS_Project_new_Batch.Service
+namespace _2026_EMS_Project_new_Batch.Repository
 {
-    public interface IReceptionistService
+    public interface IReceptionistRepository
     {
         // Patient Management
         List<Patient> SearchPatientsByPhone(string phone);
@@ -19,10 +20,9 @@ namespace _2026_EMS_Project_new_Batch.Service
         List<Patient> GetAllPatients();
         List<AppointmentViewModel> GetAppointments();
         int BookAppointment(int slotId, int patientId);
-
-
-        bool GenerateConsultationBill(int patientId, int appointmentId, decimal fee);
+        public bool GenerateConsultationBill(int patientId, int appointmentId, decimal fee);
         BillViewModel GetConsultationBillDetails(int patientId, int appointmentId);
+
         List<SlotViewModel> GetAvailableSlots();
     }
 }

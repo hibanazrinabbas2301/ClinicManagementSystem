@@ -1,4 +1,4 @@
-﻿namespace _2026_EMS_Project_new_Batch.Models
+﻿namespace ClinicManagementSystem.Models
 {
     public class Patient
     {

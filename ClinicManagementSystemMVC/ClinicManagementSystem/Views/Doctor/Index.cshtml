@@ -1,0 +1,116 @@
+﻿@model List<ClinicManagementSystem.Models.Appointment>
+
+@{
+    ViewData["Title"] = "Doctor Dashboard";
+}
+
+<h2 class="mb-4">👨‍⚕️ Doctor Dashboard - Today's Appointments</h2>
+
+<!-- Alerts -->
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["Success"]
+    </div>
+}
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["Error"]
+    </div>
+}
+
+<hr />
+
+<!-- ✅ No Appointments Case -->
+@if (Model.Count == 0)
+{
+    <div class="alert alert-info text-center">
+        No appointments scheduled for today.
+    </div>
+}
+else
+{
+    <table class="table table-bordered table-hover table-striped shadow">
+
+        <thead class="table-dark text-center">
+            <tr>
+                <th>Token</th>
+                <th>Patient Name</th>
+                <th>Time Slot</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach (var item in Model)
+            {
+                string rowClass = item.Status == "Expired"
+                ? "table-danger"
+                : "table-success";
+
+                <tr class="@rowClass text-center">
+
+                    <!-- Token -->
+                    <td>
+                        <b>@item.TokenNumber</b>
+                    </td>
+
+                    <!-- Patient -->
+                    <td>
+                        @item.PatientName
+                    </td>
+
+                    <!-- Slot -->
+                    <td>
+                        @item.StartTime - @item.EndTime
+                    </td>
+
+                    <!-- Status -->
+                    <td>
+                        @if (item.Status == "Expired")
+                        {
+                            <span class="badge bg-danger">
+                                Expired
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-success">
+                                Upcoming
+                            </span>
+                        }
+                    </td>
+
+                    <!-- Action -->
+                    <td>
+                        @if (item.Status == "Upcoming")
+                        {
+                            <a class="btn btn-primary btn-sm"
+                               asp-action="Consultation"
+                               asp-route-appointmentId="@item.AppointmentId"
+                               asp-route-patientId="@item.PatientId">
+                                Consult
+                            </a>
+                        }
+                        else if (item.Status == "Completed")
+                        {
+                            <button class="btn btn-success btn-sm" disabled>
+                                ✅ Consulted
+                            </button>
+                        }
+                        else
+                        {
+                            <button class="btn btn-secondary btn-sm" disabled>
+                                Expired
+                            </button>
+                        }
+
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

@@ -1,8 +1,10 @@
 ﻿using _2026_EMS_Project_new_Batch.Models;
+using _2026_EMS_Project_new_Batch.Repository;
+using ClinicManagementSystem.Models;
 using Microsoft.Data.SqlClient;
 using System.Data;
 
-namespace _2026_EMS_Project_new_Batch.Repository
+namespace ClinicManagementSystem.Repositories
 {
     public class ReceptionistRepositoryImpl : IReceptionistRepository
     {
@@ -10,7 +12,7 @@ namespace _2026_EMS_Project_new_Batch.Repository
 
         public ReceptionistRepositoryImpl(IConfiguration configuration)
         {
-            _connectionString = configuration.GetConnectionString("ConnStrMVC");
+            _connectionString = configuration.GetConnectionString("ConnStringMVC");
         }
         // --------------------- Patient Management ---------------------
         public Patient GetPatientById(int id)
@@ -63,7 +65,7 @@ namespace _2026_EMS_Project_new_Batch.Repository
                     cmd.Parameters.AddWithValue("@Address", patient.Address);
 
                     // Optional parameters
-                    cmd.Parameters.AddWithValue("@BloodGroup", string.IsNullOrEmpty(patient.BloodGroup) ? (object)DBNull.Value : patient.BloodGroup);
+                    cmd.Parameters.AddWithValue("@BloodGroup", string.IsNullOrEmpty(patient.BloodGroup) ? DBNull.Value : patient.BloodGroup);
                     cmd.Parameters.AddWithValue("@Status", string.IsNullOrEmpty(patient.Status) ? "Active" : patient.Status);
 
                     con.Open();

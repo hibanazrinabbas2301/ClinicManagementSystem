@@ -1,7 +1,8 @@
 ﻿using _2026_EMS_Project_new_Batch.Models;
 using _2026_EMS_Project_new_Batch.Models;
 using _2026_EMS_Project_new_Batch.Repository;
-using _2026_EMS_Project_new_Batch.Service;
+using ClinicManagementSystem.Models;
+using ClinicManagementSystem.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ClinicManagementSystem_Final.Controllers
