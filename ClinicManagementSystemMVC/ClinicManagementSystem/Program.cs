@@ -1,3 +1,6 @@
+using _2026_EMS_Project_new_Batch.Repository;
+using _2026_EMS_Project_new_Batch.Service;
+
 namespace ClinicManagementSystem
 {
     public class Program
@@ -8,6 +11,11 @@ namespace ClinicManagementSystem
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
+
+            // Register Receptionist Repository
+            builder.Services.AddScoped<IReceptionistRepository, ReceptionistRepositoryImpl>();
+            //Register Receptionist Service
+            builder.Services.AddScoped<IReceptionistService, ReceptionistServiceImpl>();
 
             var app = builder.Build();
 
@@ -28,7 +36,7 @@ namespace ClinicManagementSystem
 
             app.MapControllerRoute(
                 name: "default",
-                pattern: "{controller=Home}/{action=Index}/{id?}");
+                pattern: "{controller=Receptionist}/{action=Index}/{id?}");
 
             app.Run();
         }
