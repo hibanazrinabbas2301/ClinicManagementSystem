@@ -97,16 +97,17 @@ namespace ClinicManagementSystem_Final.Controllers
 
         // GET: View today's appointments
         [HttpGet]
-        public IActionResult TodayAppointments()
+        public IActionResult TodayAppointments(DateTime? slotDate)
         {
-            ViewBag.Patients = _receptionistService.GetAllPatients()
-                                  ?? new List<Patient>();
+            var date = slotDate ?? DateTime.Today;   // ✅ default TODAY (not tomorrow)
 
-            ViewBag.Slots = _receptionistService.GetAvailableSlots()
-                               ?? new List<SlotViewModel>();
+            ViewBag.SelectedDate = date.ToString("yyyy-MM-dd");
 
-            var appointments = _receptionistService.GetAppointments()
-                                ?? new List<AppointmentViewModel>();
+            ViewBag.Patients = _receptionistService.GetAllPatients() ?? new List<Patient>();
+
+            ViewBag.Slots = _receptionistService.GetAvailableDoctorSlots(date) ?? new List<SlotViewModel>();
+
+            var appointments = _receptionistService.GetAppointmentsByDate(date) ?? new List<AppointmentViewModel>();
 
             return View(appointments);
         }
@@ -114,32 +115,32 @@ namespace ClinicManagementSystem_Final.Controllers
         // POST: Book new appointment from modal
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult BookAppointment(int slotId, int patientId)
+        public IActionResult BookAppointment(int slotId, int patientId, DateTime slotDate)
         {
             try
             {
                 if (slotId <= 0 || patientId <= 0)
                 {
                     TempData["ErrorMessage"] = "Invalid slot or patient selection.";
-                    return RedirectToAction(nameof(TodayAppointments));
+                    return RedirectToAction(nameof(TodayAppointments), new { slotDate = slotDate.ToString("yyyy-MM-dd") });
                 }
 
                 int token = _receptionistService.BookAppointment(slotId, patientId);
 
-                // Optional: if SP returns no token, still show success
-                if (token <= 0)
-                    TempData["SuccessMessage"] = "Appointment booked successfully!";
-                else
-                    TempData["SuccessMessage"] = $"Appointment booked successfully. Token Number: {token}";
+                TempData["SuccessMessage"] = token <= 0
+                    ? "Appointment booked successfully!"
+                    : $"Appointment booked successfully. Token Number: {token}";
 
-                return RedirectToAction(nameof(TodayAppointments));
+                // ✅ reload same date that was booked
+                return RedirectToAction(nameof(TodayAppointments), new { slotDate = slotDate.ToString("yyyy-MM-dd") });
             }
             catch (Exception ex)
             {
                 TempData["ErrorMessage"] = ex.Message;
-                return RedirectToAction(nameof(TodayAppointments));
+                return RedirectToAction(nameof(TodayAppointments), new { slotDate = slotDate.ToString("yyyy-MM-dd") });
             }
         }
+
 
 
 
@@ -171,6 +172,18 @@ namespace ClinicManagementSystem_Final.Controllers
                 TempData["Error"] = "Failed to generate consultation bill.";
                 return View("GenerateConsultationBill");
             }
+        }
+        [HttpGet]
+        public JsonResult GetSlotsByDate(DateTime slotDate)
+        {
+            var slots = _receptionistService.GetAvailableDoctorSlots(slotDate);
+
+            var data = slots.Select(s => new {
+                slotId = s.SlotId,
+                text = s.DisplayText   // or build from DoctorName + Start-End
+            });
+
+            return Json(data);
         }
 
 

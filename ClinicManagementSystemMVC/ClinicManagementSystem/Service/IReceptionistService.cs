@@ -17,12 +17,15 @@ namespace ClinicManagementSystem_Final.Service
         // Scheduling / Appointments
         List<Doctor> GetAllDoctors();
         List<Patient> GetAllPatients();
-        List<AppointmentViewModel> GetAppointments();
+        //List<AppointmentViewModel> GetAppointments();
+        List<AppointmentViewModel> GetAppointmentsByDate(DateTime slotDate);
         int BookAppointment(int slotId, int patientId);
 
 
         bool GenerateConsultationBill(int patientId, int appointmentId, decimal fee);
         BillViewModel GetConsultationBillDetails(int patientId, int appointmentId);
         List<SlotViewModel> GetAvailableSlots();
+        List<SlotViewModel> GetAvailableDoctorSlots(DateTime slotDate);
+
     }
 }

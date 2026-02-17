@@ -242,48 +242,60 @@ namespace ClinicManagementSystem_Final.Repository
             return doctors;
         }
 
-        public List<AppointmentViewModel> GetAppointments()
+        public List<AppointmentViewModel> GetAppointmentsByDate(DateTime slotDate)
         {
             List<AppointmentViewModel> appointments = new List<AppointmentViewModel>();
 
             using (SqlConnection con = new SqlConnection(_connectionString))
             {
                 SqlCommand cmd = new SqlCommand(@"
-        SELECT 
-            a.AppointmentId,
-            a.PatientId,
-            a.TokenNumber,
-            p.Name AS PatientName,
-            s.Name AS DoctorName,
-            a.AppointmentDate,
-            a.Status
-        FROM Appointment a
-        INNER JOIN Patient p ON a.PatientId = p.PatientId
-        INNER JOIN Doctor d ON a.DoctorId = d.DoctorId
-        INNER JOIN Staff s ON d.StaffId = s.StaffId
-        WHERE a.AppointmentDate >= GETDATE()
-        ORDER BY a.AppointmentDate ASC", con);
+            SELECT
+                a.AppointmentId,
+                a.PatientId,
+                p.Name AS PatientName,
+                a.DoctorId,
+                st.Name AS DoctorName,
+                sp.Name AS SpecializationName,
+                a.TokenNumber,
+                a.Status,
+                a.ConsultationBill,
+                ds.SlotId,
+                ds.SlotDate,
+                ds.StartTime,
+                ds.EndTime
+            FROM Appointment a
+            INNER JOIN DoctorSlot ds ON a.SlotId = ds.SlotId
+            INNER JOIN Patient p ON a.PatientId = p.PatientId
+            INNER JOIN Doctor d ON a.DoctorId = d.DoctorId
+            INNER JOIN Staff st ON d.StaffId = st.StaffId
+            LEFT JOIN Specialization sp ON d.SpecializationId = sp.SpecializationId
+            WHERE ds.SlotDate = @SlotDate
+            ORDER BY ds.StartTime", con);
+
+                cmd.Parameters.Add("@SlotDate", SqlDbType.Date).Value = slotDate.Date;
 
                 con.Open();
-                SqlDataReader reader = cmd.ExecuteReader();
-
-                while (reader.Read())
+                using (SqlDataReader reader = cmd.ExecuteReader())
                 {
-                    appointments.Add(new AppointmentViewModel
+                    while (reader.Read())
                     {
-                        AppointmentId = reader["AppointmentId"] != DBNull.Value ? Convert.ToInt32(reader["AppointmentId"]) : 0,
-                        PatientId = reader["PatientId"] != DBNull.Value ? Convert.ToInt32(reader["PatientId"]) : 0,
-                        TokenNumber = reader["TokenNumber"] != DBNull.Value ? Convert.ToInt32(reader["TokenNumber"]) : 0,
-                        PatientName = reader["PatientName"].ToString(),
-                        DoctorName = reader["DoctorName"].ToString(),
-                        AppointmentDate = Convert.ToDateTime(reader["AppointmentDate"]),
-                        Status = reader["Status"].ToString()
-                    });
+                        appointments.Add(new AppointmentViewModel
+                        {
+                            AppointmentId = reader["AppointmentId"] != DBNull.Value ? Convert.ToInt32(reader["AppointmentId"]) : 0,
+                            PatientId = reader["PatientId"] != DBNull.Value ? Convert.ToInt32(reader["PatientId"]) : 0,
+                            TokenNumber = reader["TokenNumber"] != DBNull.Value ? Convert.ToInt32(reader["TokenNumber"]) : 0,
+                            PatientName = reader["PatientName"].ToString(),
+                            DoctorName = reader["DoctorName"].ToString(),
+                            AppointmentDate = Convert.ToDateTime(reader["SlotDate"]),
+                            Status = reader["Status"].ToString()
+                        });
+                    }
                 }
             }
 
             return appointments;
         }
+
 
 
 
@@ -298,7 +310,7 @@ namespace ClinicManagementSystem_Final.Repository
                 cmd.Parameters.AddWithValue("@PatientId", patientId);
 
                 con.Open();
-                cmd.ExecuteNonQuery();   // ✅ correct for this SP
+                cmd.ExecuteNonQuery();  
 
                 return 1; // success flag
             }
@@ -451,6 +463,39 @@ namespace ClinicManagementSystem_Final.Repository
                         {
                             SlotId = Convert.ToInt32(reader["SlotId"]),
                             DisplayText = reader["DisplayText"].ToString()
+                        });
+                    }
+                }
+            }
+
+            return slots;
+        }
+        public List<SlotViewModel> GetAvailableDoctorSlots(DateTime slotDate)
+        {
+            var slots = new List<SlotViewModel>();
+
+            using (SqlConnection con = new SqlConnection(_connectionString))
+            using (SqlCommand cmd = new SqlCommand("sp_GetAvailableDoctorSlots", con))
+            {
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@SlotDate", slotDate.Date);
+
+                con.Open();
+                using (SqlDataReader reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        // Build display text: "10:00 AM - 10:15 AM - Dr. Rajesh Kumar (Cardiologist)"
+                        TimeSpan start = (TimeSpan)reader["StartTime"];
+                        TimeSpan end = (TimeSpan)reader["EndTime"];
+
+                        string display = $"{DateTime.Today.Add(start):hh:mm tt} - {DateTime.Today.Add(end):hh:mm tt} - " +
+                                         $"{reader["DoctorName"]} ({reader["SpecializationName"]})";
+
+                        slots.Add(new SlotViewModel
+                        {
+                            SlotId = Convert.ToInt32(reader["SlotId"]),
+                            DisplayText = display
                         });
                     }
                 }
