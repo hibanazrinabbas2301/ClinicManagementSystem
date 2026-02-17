@@ -1,3 +1,6 @@
+using ClinicManagementSystem.Repository;
+using ClinicManagementSystem.Service;
+
 namespace ClinicManagementSystem
 {
     public class Program
@@ -8,6 +11,15 @@ namespace ClinicManagementSystem
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
+
+            builder.Services.AddScoped<IPharmacistRepo, PharmacistRepoImpl>();
+            builder.Services.AddScoped<IpharmacistService, PharmacistServiceImpl>();
+
+
+            builder.Services.AddScoped<IPharmacistRepo, PharmacistRepoImpl>();
+            builder.Services.AddScoped<IpharmacistService, PharmacistServiceImpl>();
+
+
 
             var app = builder.Build();
 

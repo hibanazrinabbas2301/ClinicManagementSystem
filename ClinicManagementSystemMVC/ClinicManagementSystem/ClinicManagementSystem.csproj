@@ -1,9 +1,20 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="6.1.2" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.8.6" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="ClassLibraryDataBaseConnection">
+      <HintPath>..\..\..\..\..\..\Downloads\ClassLibraryDataBaseConnection (1)\ClassLibraryDataBaseConnection\obj\Debug\net8.0\ClassLibraryDataBaseConnection.dll</HintPath>
+    </Reference>
+  </ItemGroup>
 
 </Project>
