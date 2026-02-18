@@ -6,43 +6,18 @@ namespace ClinicManagementSystem.Services
 {
     public interface IpharmacistService
     {
-        //view medcine list
-        public IEnumerable<MedicineViewModel> GetAllMedicines();
-
-        //add new medcine 
+        // Medicine
+        IEnumerable<MedicineViewModel> GetAllMedicines();
         int AddMedicine(AddMedicineViewModel model);
-
-        //category 
         IEnumerable<Category> GetCategories();
+        int UpdateMedicine(UpdateMedicineViewModel model);
 
-        //edit medcine stock
-
-        public int UpdateMedicine(UpdateMedicineViewModel model);
-
-
-        public IEnumerable<PrescriptionViewModel> GetPendingPrescriptions();
-
-
-        IEnumerable<PrescriptionViewModel> GetPrescriptionDetailsById(int prescriptionId);
+        // Prescription Flow
+        IEnumerable<PendingAppointmentViewModel> GetPendingAppointments();
+        IEnumerable<PrescriptionDetailViewModel> GetPrescriptionDetails(int appointmentId);
+        string IssuePrescription(int appointmentId);
 
 
-
-        int IssuePrescription(int prescriptionId);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        IEnumerable<IssuedMedicineBillViewModel> GetIssuedMedicinesBill();
     }
 }

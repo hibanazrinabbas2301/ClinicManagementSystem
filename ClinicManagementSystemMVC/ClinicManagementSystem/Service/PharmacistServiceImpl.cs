@@ -1,6 +1,7 @@
 ﻿using ClinicManagementSystem.Models;
 using ClinicManagementSystem.Repositories;
 using ClinicManagementSystem.ViewModel;
+using Microsoft.AspNetCore.Mvc;
 
 namespace ClinicManagementSystem.Services
 {
@@ -13,49 +14,33 @@ namespace ClinicManagementSystem.Services
             _pharmacistRepo = pharmacistRepo;
         }
 
+        // Medicine
         public IEnumerable<MedicineViewModel> GetAllMedicines()
-        {
-            return _pharmacistRepo.GetAllMedicines();
-        }
+            => _pharmacistRepo.GetAllMedicines();
 
         public int AddMedicine(AddMedicineViewModel model)
-        {
-            return _pharmacistRepo.AddMedicine(model);
-        }
-
-
-        public IEnumerable<Category> GetCategories()
-        {
-            return _pharmacistRepo.GetCategories();
-        }
-
+            => _pharmacistRepo.AddMedicine(model);
 
         public int UpdateMedicine(UpdateMedicineViewModel model)
-        {
-            return _pharmacistRepo.UpdateMedicine(model);
-        }
+            => _pharmacistRepo.UpdateMedicine(model);
+
+        public IEnumerable<Category> GetCategories()
+            => _pharmacistRepo.GetCategories();
+
+        // Prescription Flow
+        public IEnumerable<PendingAppointmentViewModel> GetPendingAppointments()
+            => _pharmacistRepo.GetPendingAppointments();
+
+        public IEnumerable<PrescriptionDetailViewModel> GetPrescriptionDetails(int appointmentId)
+            => _pharmacistRepo.GetPrescriptionDetails(appointmentId);
+
+        public string IssuePrescription(int appointmentId)
+             => _pharmacistRepo.IssuePrescription(appointmentId);
 
 
-        public IEnumerable<PrescriptionViewModel> GetPendingPrescriptions()
-        {
-            return _pharmacistRepo.GetPendingPrescriptions();
-        }
-
-
-        public IEnumerable<PrescriptionViewModel> GetPrescriptionDetailsById(int prescriptionId)
-        {
-            return _pharmacistRepo.GetPrescriptionDetailsById(prescriptionId);
-        }
-
-
-
-        public int IssuePrescription(int prescriptionId)
-        {
-            return _pharmacistRepo.IssuePrescription(prescriptionId);
-        }
-
-
-
+        public IEnumerable<IssuedMedicineBillViewModel> GetIssuedMedicinesBill()
+             => _pharmacistRepo.GetIssuedMedicinesBill();
     }
+
 
 }

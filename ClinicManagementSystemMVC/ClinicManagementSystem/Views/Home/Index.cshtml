@@ -1,75 +1,170 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
-}
-@{
     ViewData["Title"] = "Pharmacist Dashboard";
 }
 
-<div class="container mt-4">
-    <h2 class="mb-4 text-center">Pharmacist Dashboard</h2>
+<style>
+    .dashboard-wrapper {
+        min-height: 80vh;
+        background: linear-gradient(135deg, #f0f4ff 0%, #fafafa 100%);
+        padding: 40px 20px;
+    }
 
-    <div class="row g-4">
+    .dashboard-header {
+        text-align: center;
+        margin-bottom: 48px;
+    }
 
-        <!-- Inventory Management -->
-        <div class="col-md-4">
-            <div class="card shadow-lg border-0 h-100 text-center">
-                <div class="card-body">
-                    <div class="mb-3">
-                        <i class="bi bi-capsule-pill text-primary" style="font-size: 3rem;"></i>
+        .dashboard-header h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1a1a2e;
+            letter-spacing: 0.5px;
+        }
+
+        .dashboard-header p {
+            color: #6c757d;
+            font-size: 1rem;
+            margin-top: 6px;
+        }
+
+    .dash-card {
+        border: none;
+        border-radius: 16px;
+        padding: 36px 28px;
+        background: #ffffff;
+        box-shadow: 0 4px 24px rgba(0,0,0,0.07);
+        transition: transform 0.25s ease, box-shadow 0.25s ease;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+        .dash-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 12px 36px rgba(0,0,0,0.12);
+        }
+
+    .dash-icon-wrap {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 22px;
+        font-size: 2rem;
+    }
+
+    .icon-blue {
+        background: #e8f0fe;
+        color: #1a73e8;
+    }
+
+    .icon-orange {
+        background: #fff4e5;
+        color: #f57c00;
+    }
+
+    .dash-card h5 {
+        font-size: 1.15rem;
+        font-weight: 700;
+        color: #1a1a2e;
+        margin-bottom: 10px;
+    }
+
+    .dash-card p {
+        font-size: 0.9rem;
+        color: #6c757d;
+        flex-grow: 1;
+        margin-bottom: 24px;
+    }
+
+    .dash-btn {
+        width: 100%;
+        padding: 10px;
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        border: none;
+        transition: opacity 0.2s;
+        text-decoration: none;
+        display: inline-block;
+    }
+
+        .dash-btn:hover {
+            opacity: 0.88;
+        }
+
+    .btn-blue {
+        background: #1a73e8;
+        color: #fff;
+    }
+
+    .btn-orange {
+        background: #f57c00;
+        color: #fff;
+    }
+
+    .greeting-badge {
+        display: inline-block;
+        background: #e8f0fe;
+        color: #1a73e8;
+        font-size: 0.82rem;
+        font-weight: 600;
+        padding: 4px 14px;
+        border-radius: 20px;
+        margin-bottom: 12px;
+        letter-spacing: 0.4px;
+    }
+</style>
+
+<div class="dashboard-wrapper">
+    <div class="container">
+
+        <!-- Header -->
+        <div class="dashboard-header">
+            <span class="greeting-badge">👋 Welcome back</span>
+            <h2>Pharmacist Dashboard</h2>
+            <p>Manage your pharmacy operations from one place</p>
+        </div>
+
+        <!-- Cards Row — centered with 2 cards -->
+        <div class="row g-4 justify-content-center">
+
+            <!-- Inventory Management -->
+            <div class="col-md-4">
+                <div class="dash-card">
+                    <div class="dash-icon-wrap icon-blue">
+                        <i class="bi bi-capsule-pill"></i>
                     </div>
-                    <h5 class="card-title">Inventory Management</h5>
-                    <p class="card-text">
-                        Manage medicines, stock levels, expiry dates and pricing.
-                    </p>
+                    <h5>Inventory Management</h5>
+                    <p>Manage medicines, stock levels, expiry dates and pricing efficiently.</p>
                     <a asp-controller="Pharmacist"
                        asp-action="Index"
-                       class="btn btn-primary w-100">
+                       class="dash-btn btn-blue">
                         Go to Inventory
                     </a>
                 </div>
             </div>
-        </div>
 
-        <!-- Pending Prescriptions -->
-        <div class="col-md-4">
-            <div class="card shadow-lg border-0 h-100 text-center">
-                <div class="card-body">
-                    <div class="mb-3">
-                        <i class="bi bi-file-medical text-warning" style="font-size: 3rem;"></i>
+            <!-- Pending Prescriptions -->
+            <div class="col-md-4">
+                <div class="dash-card">
+                    <div class="dash-icon-wrap icon-orange">
+                        <i class="bi bi-file-medical"></i>
                     </div>
-                    <h5 class="card-title">Pending Prescriptions</h5>
-                    <p class="card-text">
-                        View and issue medicines prescribed by doctors.
-                    </p>
+                    <h5>Pending Prescriptions</h5>
+                    <p>View and issue medicines prescribed by doctors for patients.</p>
                     <a asp-controller="Prescription"
                        asp-action="Index"
-                       class="btn btn-warning w-100 text-white">
+                       class="dash-btn btn-orange">
                         View Prescriptions
                     </a>
-
-
                 </div>
             </div>
-        </div>
 
-        <!-- Billing -->
-        <div class="col-md-4">
-            <div class="card shadow-lg border-0 h-100 text-center">
-                <div class="card-body">
-                    <div class="mb-3">
-                        <i class="bi bi-receipt text-success" style="font-size: 3rem;"></i>
-                    </div>
-                    <h5 class="card-title">Billing</h5>
-                    <p class="card-text">
-                        Generate bills and view billing history.
-                    </p>
-                    <a asp-controller="Pharmacist"
-                       asp-action="Billing"
-                       class="btn btn-success w-100">
-                        Go to Billing
-                    </a>
-                </div>
-            </div>
         </div>
 
     </div>

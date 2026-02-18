@@ -1,0 +1,238 @@
+﻿@model IEnumerable<ClinicManagementSystem.ViewModel.IssuedMedicineBillViewModel>
+
+@{
+    ViewData["Title"] = "Issued Medicine Bills";
+}
+
+<div class="container mt-4">
+
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="fw-bold text-primary">
+            💳 Issued Medicine Bills
+        </h2>
+
+        <!-- Search -->
+        <input type="text"
+               id="searchInput"
+               class="form-control w-25"
+               placeholder="Search Patient / Appointment..." />
+    </div>
+
+    <hr />
+
+    <!-- Bills Table -->
+    <table class="table table-bordered table-hover shadow" id="issuedTable">
+        <thead class="table-dark text-center">
+            <tr>
+                <th>Appointment ID</th>
+                <th>Patient Name</th>
+                <th>Issue Date</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @if (Model != null && Model.Any())
+            {
+                foreach (var group in Model.GroupBy(x => x.AppointmentId))
+                {
+                    var first = group.First();
+
+                    <tr class="issued-row text-center"
+                        data-appointment="@group.Key"
+                        data-patient="@first.PatientName.ToLower()">
+
+                        <td>@group.Key</td>
+                        <td>@first.PatientName</td>
+                        <td>@first.IssueDate.ToString("dd-MM-yyyy")</td>
+
+                        <td>
+                            <button class="btn btn-info btn-sm viewBillBtn"
+                                    data-id="@group.Key">
+                                <i class="bi bi-eye"></i> View Bill
+                            </button>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="4" class="text-center text-muted">
+                        ❌ No issued bills found.
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+
+<!-- ========================= -->
+<!-- BILL MODAL -->
+<!-- ========================= -->
+<div class="modal fade" id="billModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content shadow-lg">
+
+            <!-- Modal Header -->
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">🧾 Bill Details</h5>
+                <button type="button" class="btn-close btn-close-white"
+                        data-bs-dismiss="modal"></button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="modal-body">
+
+                <p><strong>Patient:</strong> <span id="billPatientName"></span></p>
+                <p><strong>Appointment ID:</strong> <span id="billAppointmentId"></span></p>
+
+                <table class="table table-bordered">
+                    <thead class="table-secondary text-center">
+                        <tr>
+                            <th>Medicine</th>
+                            <th>Qty</th>
+                            <th>Price (₹)</th>
+                            <th>Total (₹)</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="billDetailsBody"></tbody>
+
+                    <tfoot>
+                        <tr class="table-dark text-center">
+                            <td colspan="3"><strong>Grand Total</strong></td>
+                            <td><strong id="grandTotal"></strong></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="modal-footer">
+                <button class="btn btn-danger" id="printBillBtn">
+                    <i class="bi bi-file-earmark-pdf"></i> Generate PDF
+                </button>
+
+                <button class="btn btn-secondary"
+                        data-bs-dismiss="modal">
+                    Close
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+
+<script>
+    // ==============================
+    // Convert Model Data to JS Array
+    // ==============================
+    var allData = @Html.Raw(
+        System.Text.Json.JsonSerializer.Serialize(
+            Model?.Select(x => new {
+                appointmentId = x.AppointmentId,
+                patientName = x.PatientName,
+                medicineName = x.MedicineName,
+                quantityIssued = x.QuantityIssued,
+                price = x.Price,
+                totalAmount = x.TotalAmount,
+                issueDate = x.IssueDate.ToString("dd-MM-yyyy")
+            }) ?? Enumerable.Empty<object>()
+        )
+    );
+
+    $(document).ready(function () {
+
+        // ==============================
+        // SEARCH FILTER
+        // ==============================
+        $("#searchInput").on("keyup", function () {
+
+            var value = $(this).val().toLowerCase();
+
+            $(".issued-row").each(function () {
+
+                var patient = $(this).data("patient").toString();
+                var appointment = $(this).data("appointment").toString();
+
+                if (patient.includes(value) || appointment.includes(value)) {
+                    $(this).show();
+                } else {
+                    $(this).hide();
+                }
+            });
+        });
+
+
+        // ==============================
+        // VIEW BILL MODAL
+        // ==============================
+        $(document).on("click", ".viewBillBtn", function () {
+
+            var appointmentId = $(this).data("id");
+
+            // Filter medicines for appointment
+            var rows = allData.filter(x => x.appointmentId == appointmentId);
+
+            if (rows.length === 0) {
+                alert("No bill details found!");
+                return;
+            }
+
+            // Patient Name
+            $("#billPatientName").text(rows[0].patientName);
+            $("#billAppointmentId").text(appointmentId);
+
+            // Store appointment for PDF
+            $("#printBillBtn").attr("data-id", appointmentId);
+
+            // Fill Table
+            $("#billDetailsBody").empty();
+
+            var grandTotal = 0;
+
+            $.each(rows, function (i, item) {
+
+                grandTotal += item.totalAmount;
+
+                $("#billDetailsBody").append(`
+                    <tr class="text-center">
+                        <td>${item.medicineName}</td>
+                        <td>${item.quantityIssued}</td>
+                        <td>₹${item.price.toFixed(2)}</td>
+                        <td>₹${item.totalAmount.toFixed(2)}</td>
+                    </tr>
+                `);
+            });
+
+            $("#grandTotal").text("₹" + grandTotal.toFixed(2));
+
+            // Show Modal
+            $("#billModal").modal("show");
+        });
+
+
+        // ==============================
+        // GENERATE PDF
+        // ==============================
+        $("#printBillBtn").on("click", function () {
+
+            var appointmentId = $(this).attr("data-id");
+
+            if (!appointmentId) {
+                alert("Appointment ID missing!");
+                return;
+            }
+
+            window.open("/Prescription/GenerateBillPdf?appointmentId=" + appointmentId, "_blank");
+        });
+
+    });
+</script>
+}

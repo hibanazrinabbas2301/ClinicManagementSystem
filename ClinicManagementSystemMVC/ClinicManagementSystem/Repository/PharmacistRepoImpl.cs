@@ -7,7 +7,7 @@ using System.Data;
 
 namespace ClinicManagementSystem.Repositories
 {
-    public class PharmacistRepoImpl:IPharmacistRepo
+    public class PharmacistRepoImpl : IPharmacistRepo
     {
 
 
@@ -114,7 +114,7 @@ namespace ClinicManagementSystem.Repositories
         #endregion
 
         #region edit medcine stock
-        
+
         public int UpdateMedicine(UpdateMedicineViewModel model)
         {
             int rowsAffected = 0;
@@ -154,33 +154,28 @@ namespace ClinicManagementSystem.Repositories
         }
         #endregion
 
-        public IEnumerable<PrescriptionViewModel> GetPendingPrescriptions()
+        // 🔹 Get Pending Appointments
+        public IEnumerable<PendingAppointmentViewModel> GetPendingAppointments()
         {
-            List<PrescriptionViewModel> list = new List<PrescriptionViewModel>();
+            List<PendingAppointmentViewModel> list = new();
 
             string connectionString = _configuration.GetConnectionString("ConnStringMVC");
 
-            using (SqlConnection connection = new SqlConnection(connectionString))
+            using (SqlConnection connection = ConnectionManager.OpenConnection(connectionString))
             {
-                connection.Open();   // 🚨 THIS IS IMPORTANT
-
-                using (SqlCommand cmd = new SqlCommand("sp_Pharmacist_PendingPrescriptions", connection))
+                if (connection != null)
                 {
+                    SqlCommand cmd = new SqlCommand("sp_Pharmacist_PendingPrescriptions  ", connection);
                     cmd.CommandType = CommandType.StoredProcedure;
 
                     using (SqlDataReader reader = cmd.ExecuteReader())
                     {
                         while (reader.Read())
                         {
-                            list.Add(new PrescriptionViewModel
+                            list.Add(new PendingAppointmentViewModel
                             {
-                                PrescriptionId = Convert.ToInt32(reader["PrescriptionId"]),
+                                AppointmentId = Convert.ToInt32(reader["AppointmentId"]),
                                 PatientName = reader["PatientName"].ToString(),
-                                MedicineName = reader["MedicineName"].ToString(),
-                                Quantity = Convert.ToInt32(reader["Quantity"]),
-                                Frequency = reader["Frequency"].ToString(),
-                                DurationDays = Convert.ToInt32(reader["DurationDays"]),
-                                Status = reader["Status"].ToString(),
                                 PrescribedDate = Convert.ToDateTime(reader["PrescribedDate"])
                             });
                         }
@@ -191,34 +186,35 @@ namespace ClinicManagementSystem.Repositories
             return list;
         }
 
-        public IEnumerable<PrescriptionViewModel> GetPrescriptionDetailsById(int prescriptionId)
+        // 🔹 Get Prescription Details (Multiple Medicines)
+        public IEnumerable<PrescriptionDetailViewModel> GetPrescriptionDetails(int appointmentId)
         {
-            List<PrescriptionViewModel> list = new List<PrescriptionViewModel>();
+            List<PrescriptionDetailViewModel> list = new();
 
             string connectionString = _configuration.GetConnectionString("ConnStringMVC");
 
-            using (SqlConnection connection = new SqlConnection(connectionString))
+            using (SqlConnection connection = ConnectionManager.OpenConnection(connectionString))
             {
-                SqlCommand cmd = new SqlCommand("sp_Pharmacist_PrescriptionDetails", connection);
-                cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("@PrescriptionId", prescriptionId);
-
-                connection.Open();
-
-                using (SqlDataReader reader = cmd.ExecuteReader())
+                if (connection != null)
                 {
-                    while (reader.Read())
+                    SqlCommand cmd = new SqlCommand("sp_GetPrescriptionDetailsByAppointmentId", connection);
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@AppointmentId", appointmentId);
+
+                    using (SqlDataReader reader = cmd.ExecuteReader())
                     {
-                        list.Add(new PrescriptionViewModel
+                        while (reader.Read())
                         {
-                            PrescriptionId = Convert.ToInt32(reader["PrescriptionId"]),
-                            PatientName = reader["PatientName"].ToString(),
-                            MedicineName = reader["MedicineName"].ToString(),
-                            Quantity = Convert.ToInt32(reader["Quantity"]),
-                            Frequency = reader["Frequency"].ToString(),
-                            DurationDays = Convert.ToInt32(reader["DurationDays"]),
-                            Status = reader["Status"].ToString()
-                        });
+                            list.Add(new PrescriptionDetailViewModel
+                            {
+                                PrescriptionId = Convert.ToInt32(reader["PrescriptionId"]),
+                                MedicineId = Convert.ToInt32(reader["MedicineId"]),
+                                MedicineName = reader["MedicineName"].ToString(),
+                                Quantity = Convert.ToInt32(reader["Quantity"]),
+                                Frequency = reader["Frequency"].ToString(),
+                                DurationDays = Convert.ToInt32(reader["DurationDays"])
+                            });
+                        }
                     }
                 }
             }
@@ -226,34 +222,60 @@ namespace ClinicManagementSystem.Repositories
             return list;
         }
 
-
-
-        public int IssuePrescription(int prescriptionId)
+        // 🔹 Issue Prescription
+        public string IssuePrescription(int prescriptionId)
         {
-            int result = 0;
-
             string connectionString = _configuration.GetConnectionString("ConnStringMVC");
-
-            using (SqlConnection connection = new SqlConnection(connectionString))
+            using (SqlConnection connection = ConnectionManager.OpenConnection(connectionString))
             {
-                using (SqlCommand cmd = new SqlCommand("sp_IssuePrescription", connection))
+                if (connection != null)
                 {
+                    SqlCommand cmd = new SqlCommand("sp_IssuePrescription", connection);
                     cmd.CommandType = CommandType.StoredProcedure;
                     cmd.Parameters.AddWithValue("@PrescriptionId", prescriptionId);
 
-                    connection.Open();
-
-                    object response = cmd.ExecuteScalar();
-
-                    if (response != null)
-                        result = Convert.ToInt32(response);
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        if (reader.Read())
+                            return reader["Result"].ToString();
+                    }
                 }
             }
-
-            return result;
+            return "ERROR";
         }
 
 
 
+        public IEnumerable<IssuedMedicineBillViewModel> GetIssuedMedicinesBill()
+        {
+            List<IssuedMedicineBillViewModel> list = new();
+            string connectionString = _configuration.GetConnectionString("ConnStringMVC");
+            using (SqlConnection connection = ConnectionManager.OpenConnection(connectionString))
+            {
+                if (connection != null)
+                {
+                    SqlCommand cmd = new SqlCommand("sp_GetIssuedMedicinesBill", connection);
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            list.Add(new IssuedMedicineBillViewModel
+                            {
+                                AppointmentId = Convert.ToInt32(reader["AppointmentId"]),
+                                PatientName = reader["PatientName"].ToString(),
+                                MedicineName = reader["MedicineName"].ToString(),
+                                QuantityIssued = Convert.ToInt32(reader["QuantityIssued"]),
+                                Price = Convert.ToDecimal(reader["Price"]),
+                                TotalAmount = Convert.ToDecimal(reader["TotalAmount"]),
+                                IssueDate = Convert.ToDateTime(reader["IssueDate"])
+                            });
+                        }
+                    }
+                }
+            }
+            return list;
+        }
     }
+
 }

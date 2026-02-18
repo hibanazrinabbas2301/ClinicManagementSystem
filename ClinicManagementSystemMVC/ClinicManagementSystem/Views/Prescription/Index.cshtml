@@ -1,4 +1,4 @@
-﻿@model IEnumerable<dynamic>
+﻿@model IEnumerable<ClinicManagementSystem.ViewModel.PendingAppointmentViewModel>
 
 @{
     ViewData["Title"] = "Pending Prescriptions";
@@ -6,12 +6,17 @@
 
 <div class="container mt-4">
 
-    <h2 class="mb-4">Pending Prescriptions</h2>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Pending Prescriptions</h2>
+        <a href="/Prescription/IssuedBills" class="btn btn-success">
+            <i class="bi bi-receipt"></i> View Bills
+        </a>
+    </div>
 
     <table class="table table-bordered table-hover">
         <thead class="table-dark">
             <tr>
-                <th>Prescription Id</th>
+                <th>Appointment Id</th>
                 <th>Patient</th>
                 <th>Date</th>
                 <th>Action</th>
@@ -19,18 +24,28 @@
         </thead>
 
         <tbody>
-            @foreach (var item in Model)
+            @if (Model != null && Model.Any())
+            {
+                foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.AppointmentId</td>
+                        <td>@item.PatientName</td>
+                        <td>@item.PrescribedDate.ToString("dd-MM-yyyy")</td>
+                        <td>
+                            <button class="btn btn-primary btn-sm viewBtn"
+                                    data-id="@item.AppointmentId">
+                                <i class="bi bi-eye"></i> View
+                            </button>
+                        </td>
+                    </tr>
+                }
+            }
+            else
             {
                 <tr>
-                    <td>@item.PrescriptionId</td>
-                    <td>@item.PatientName</td>
-                    <td>@item.PrescribedDate.ToString("dd-MM-yyyy")</td>
-                    <td>
-                        <button class="btn btn-primary btn-sm viewBtn"
-                                data-id="@item.PrescriptionId">
-                            View
-                        </button>
-
+                    <td colspan="4" class="text-center text-muted">
+                        No Pending Prescriptions
                     </td>
                 </tr>
             }
@@ -39,8 +54,7 @@
 
 </div>
 
-
-<!-- Modal -->
+<!-- Prescription Modal -->
 <div class="modal fade" id="prescriptionModal" tabindex="-1">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -58,20 +72,12 @@
                             <th>Quantity</th>
                             <th>Frequency</th>
                             <th>Duration</th>
+                            <th>Issue</th>
                         </tr>
                     </thead>
                     <tbody id="prescriptionDetailsBody">
                     </tbody>
                 </table>
-            </div>
-
-            <div class="modal-footer">
-                <button class="btn btn-success"
-                        id="issueBtn"
-                        data-id="">
-                    Issue
-                </button>
-
             </div>
 
         </div>
@@ -87,13 +93,10 @@
             // ==============================
             $(document).on("click", ".viewBtn", function () {
 
-                var prescriptionId = $(this).data("id");
-
-                // Set Issue button prescription id
-                $("#issueBtn").attr("data-id", prescriptionId);
+                var appointmentId = $(this).data("id");
 
                 $.get("/Prescription/GetPrescriptionDetails",
-                    { id: prescriptionId },
+                    { appointmentId: appointmentId },
                     function (data) {
 
                         $("#prescriptionDetailsBody").empty();
@@ -106,6 +109,13 @@
                                     <td>${item.quantity}</td>
                                     <td>${item.frequency}</td>
                                     <td>${item.durationDays}</td>
+
+                                    <td>
+                                        <button class="btn btn-success issueSingleBtn"
+                                                data-id="${item.prescriptionId}">
+                                            Issue
+                                        </button>
+                                    </td>
                                 </tr>`
                             );
                         });
@@ -116,26 +126,28 @@
 
 
             // ==============================
-            // ISSUE PRESCRIPTION
+            // ISSUE SINGLE MEDICINE (Correct)
             // ==============================
-            $(document).on("click", "#issueBtn", function () {
+            $(document).on("click", ".issueSingleBtn", function () {
 
-                var prescriptionId = $(this).attr("data-id");
+                var prescriptionId = $(this).data("id");
 
                 $.ajax({
                     url: "/Prescription/Issue",
                     type: "POST",
                     data: { prescriptionId: prescriptionId },
+
                     success: function (response) {
 
                         if (response.success) {
-                            alert("Medicine Issued Successfully!");
+                            alert("✅ Medicine Issued Successfully!");
                             location.reload();
                         }
                         else {
-                            alert(response.message || "Stock not available");
+                            alert(response.message);
                         }
                     },
+
                     error: function () {
                         alert("Error occurred while issuing medicine.");
                     }

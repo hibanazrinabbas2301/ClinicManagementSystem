@@ -8,57 +8,61 @@ namespace ClinicManagementSystem.Controllers
     {
         private readonly IpharmacistService _pharmacistService;
 
-        // Dependency Injection Constructor
         public PrescriptionController(IpharmacistService pharmacistService)
         {
             _pharmacistService = pharmacistService;
         }
 
+        // Pending list
         public IActionResult Index()
         {
-            var data = _pharmacistService.GetPendingPrescriptions();
-
-            var grouped = data
-                .GroupBy(x => x.PrescriptionId)
-                .Select(g => new PendingPrescriptionViewModel
-                {
-                    PrescriptionId = g.Key,
-                    PatientName = g.First().PatientName,
-                    PrescribedDate = g.First().PrescribedDate
-                }).ToList();
-
-            return View(grouped);
+            var data = _pharmacistService.GetPendingAppointments();
+            return View(data);
         }
 
-
-
-
-        [HttpGet]
-        public IActionResult GetPrescriptionDetails(int id)
+        // Get multiple medicines
+        public IActionResult GetPrescriptionDetails(int appointmentId)
         {
-            var data = _pharmacistService.GetPrescriptionDetailsById(id);
-
+            var data = _pharmacistService.GetPrescriptionDetails(appointmentId);
             return Json(data);
         }
 
-
-
-
+        // Issue
         [HttpPost]
         public IActionResult Issue(int prescriptionId)
         {
             var result = _pharmacistService.IssuePrescription(prescriptionId);
 
-            if (result == 1)
-            {
+            if (result == "SUCCESS")
                 return Json(new { success = true });
-            }
 
-            return Json(new { success = false, message = "Stock not available" });
+            if (result == "OUT_OF_STOCK")
+                return Json(new { success = false, message = "Out of Stock! Insufficient medicine quantity." });
+
+            return Json(new { success = false, message = "Something went wrong. Please try again." });
         }
 
 
+
+
+        // Issued medicines list page
+        public IActionResult IssuedBills()
+        {
+            var data = _pharmacistService.GetIssuedMedicinesBill();
+            return View(data);
+        }
+
+        // PDF generation
+        public IActionResult GenerateBillPdf(int appointmentId)
+        {
+            var data = _pharmacistService.GetIssuedMedicinesBill()
+                       .Where(x => x.AppointmentId == appointmentId)
+                       .ToList();
+
+            return View("BillPdf", data);
+        }
     }
+
 
 
 }
