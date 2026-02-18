@@ -1,9 +1,12 @@
 ﻿using ClinicManagementSystem.Models;
+using ClinicManagementSystem.Security;
 using ClinicManagementSystem.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ClinicManagementSystem.Controllers
 {
+    [RoleAuthorize("Lab Technician")]
+
     public class LabTechniciansController : Controller
     {
         private readonly ILabTechnicianService _labTechnicianService;
@@ -31,6 +34,8 @@ namespace ClinicManagementSystem.Controllers
 
         public ActionResult Index()
         {
+            
+
             ViewBag.PendingTests = _labTechnicianService.SelectPendingTests();
 
             var labTests = _labTechnicianService.SelectAllLabTests().ToList();

@@ -1,225 +1,345 @@
 ﻿@model ClinicManagementSystem.Models.Diagnosis
 
-<h2 class="mb-3">👨‍⚕️ Consultation Page</h2>
+@{
+    ViewData["Title"] = "Consultation";
+}
 
-<!-- Alerts -->
+<!-- ============================= -->
+<!-- ✅ Page Header -->
+<!-- ============================= -->
+<div class="mb-4">
+    <h2 class="fw-bold text-primary">
+        👨‍⚕️ Doctor Consultation Panel
+    </h2>
+    <p class="text-muted mb-0">
+        Manage Diagnosis, Prescriptions, Lab Tests & Patient History
+    </p>
+</div>
+
+<hr />
+
+<!-- ============================= -->
+<!-- ✅ Alerts -->
+<!-- ============================= -->
 @if (TempData["Success"] != null)
 {
-    <div class="alert alert-success">@TempData["Success"]</div>
+    <div class="alert alert-success alert-dismissible fade show shadow-sm">
+        <strong>Success:</strong> @TempData["Success"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
 }
 
 @if (TempData["Error"] != null)
 {
-    <div class="alert alert-danger">@TempData["Error"]</div>
+    <div class="alert alert-danger alert-dismissible fade show shadow-sm">
+        <strong>Error:</strong> @TempData["Error"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
 }
 
-<hr />
+<!-- ============================= -->
+<!-- ✅ Patient Basic Details -->
+<!-- ============================= -->
+@{
+    var patient = ViewBag.PatientInfo as ClinicManagementSystem.View_Model.PatientBasicInfo;
+}
 
-<!-- ========================= -->
+@if (patient != null)
+{
+    <div class="card shadow-sm border-0 rounded-4 mb-4">
+        <div class="card-header bg-info text-white rounded-top-4">
+            <h5 class="mb-0">👤 Patient Basic Details</h5>
+        </div>
+
+        <div class="card-body row text-center">
+
+            <div class="col-md-3">
+                <h6 class="text-muted">Name</h6>
+                <p class="fw-bold">@patient.PatientName</p>
+            </div>
+
+            <div class="col-md-3">
+                <h6 class="text-muted">Age</h6>
+                <p class="fw-bold">@patient.Age</p>
+            </div>
+
+            <div class="col-md-3">
+                <h6 class="text-muted">Gender</h6>
+                <p class="fw-bold">@patient.Gender</p>
+            </div>
+
+            <div class="col-md-3">
+                <h6 class="text-muted">Blood Group</h6>
+                <p class="fw-bold text-danger">@patient.BloodGroup</p>
+            </div>
+
+        </div>
+    </div>
+}
+
+<!-- ============================= -->
 <!-- ✅ Diagnosis Section -->
-<!-- ========================= -->
-<h4 class="text-success">📝 Diagnosis Details</h4>
+<!-- ============================= -->
+<div class="card shadow-lg border-0 rounded-4 mb-4">
+    <div class="card-header bg-success text-white rounded-top-4">
+        <h5 class="mb-0">📝 Diagnosis Details</h5>
+    </div>
 
-<form asp-action="AddDiagnosis" method="post">
+    <div class="card-body">
 
-    <input asp-for="AppointmentId" type="hidden" />
-    <input asp-for="PatientId" type="hidden" />
+        <form asp-action="AddDiagnosis" method="post">
 
-    <!-- Symptoms -->
-    <label><b>Symptoms</b></label>
-    <textarea asp-for="Symptoms" class="form-control"></textarea>
-    <span asp-validation-for="Symptoms" class="text-danger"></span>
+            <input asp-for="AppointmentId" type="hidden" />
+            <input asp-for="PatientId" type="hidden" />
 
-    <!-- Diagnosis -->
-    <label class="mt-2"><b>Diagnosis</b></label>
-    <textarea asp-for="DiagnosisText" class="form-control"></textarea>
-    <span asp-validation-for="DiagnosisText" class="text-danger"></span>
+            <!-- Symptoms -->
+            <div class="mb-3">
+                <label class="fw-semibold">Symptoms</label>
+                <textarea asp-for="Symptoms" class="form-control" rows="2"
+                          placeholder="Enter patient symptoms..."></textarea>
+                <span asp-validation-for="Symptoms" class="text-danger"></span>
+            </div>
 
-    <!-- Doctor Notes -->
-    <label class="mt-2"><b>Doctor Notes</b></label>
-    <textarea asp-for="DoctorNotes" class="form-control"></textarea>
-    <span asp-validation-for="DoctorNotes" class="text-danger"></span>
+            <!-- Diagnosis -->
+            <div class="mb-3">
+                <label class="fw-semibold">Diagnosis</label>
+                <textarea asp-for="DiagnosisText" class="form-control" rows="2"
+                          placeholder="Enter diagnosis details..."></textarea>
+                <span asp-validation-for="DiagnosisText" class="text-danger"></span>
+            </div>
 
-    <button type="submit" class="btn btn-outline-success mt-3">
-        💾 Save Diagnosis Draft
-    </button>
-</form>
+            <!-- Doctor Notes -->
+            <div class="mb-3">
+                <label class="fw-semibold">Doctor Notes</label>
+                <textarea asp-for="DoctorNotes" class="form-control" rows="2"
+                          placeholder="Enter doctor notes..."></textarea>
+                <span asp-validation-for="DoctorNotes" class="text-danger"></span>
+            </div>
 
-<hr />
+            <button type="submit" class="btn btn-success px-4 shadow-sm">
+                💾 Save Diagnosis Draft
+            </button>
+        </form>
+    </div>
+</div>
 
-<!-- ========================= -->
-<!-- ✅ Medicine Prescription -->
-<!-- ========================= -->
-<h4 class="text-primary">💊 Add Medicines</h4>
+<!-- ============================= -->
+<!-- ✅ Medicines + Lab Tests Section -->
+<!-- ============================= -->
+<div class="row">
 
-<form asp-action="AddMedicinePrescription" method="post">
+    <!-- ============================= -->
+    <!-- 💊 Medicines -->
+    <!-- ============================= -->
+    <div class="col-md-6 mb-4">
+        <div class="card shadow-sm border-0 rounded-4 h-100">
+            <div class="card-header bg-primary text-white rounded-top-4">
+                <h5 class="mb-0">💊 Add Medicines</h5>
+            </div>
 
-    <input type="hidden" name="AppointmentId" value="@Model.AppointmentId" />
-    <input type="hidden" name="PatientId" value="@Model.PatientId" />
+            <div class="card-body">
 
-    <label><b>Select Medicine</b></label>
-    <select name="MedicineId" class="form-control" required>
-        <option value="">-- Select Medicine --</option>
-        @foreach (var med in ViewBag.Medicines)
-        {
-            <option value="@med.MedicineId">@med.MedicineName</option>
-        }
-    </select>
+                <form asp-action="AddMedicinePrescription" method="post">
 
-    <label class="mt-2"><b>Quantity</b></label>
-    <input type="number" name="Quantity" class="form-control" min="1" required />
+                    <input type="hidden" name="AppointmentId" value="@Model.AppointmentId" />
+                    <input type="hidden" name="PatientId" value="@Model.PatientId" />
 
-    <label class="mt-2"><b>Frequency</b></label>
-    <input type="text" name="Frequency" class="form-control"
-           placeholder="Eg: Morning & Night" required />
+                    <div class="mb-3">
+                        <label class="fw-semibold">Select Medicine</label>
+                        <select name="MedicineId" class="form-select" required>
+                            <option value="">-- Select Medicine --</option>
+                            @foreach (var med in ViewBag.Medicines)
+                            {
+                                <option value="@med.MedicineId">@med.MedicineName</option>
+                            }
+                        </select>
+                    </div>
 
-    <label class="mt-2"><b>Duration (Days)</b></label>
-    <input type="number" name="DurationDays" class="form-control" min="1" required />
+                    <div class="mb-3">
+                        <label class="fw-semibold">Quantity</label>
+                        <input type="number" name="Quantity" class="form-control" min="1" required />
+                    </div>
 
-    <button class="btn btn-primary mt-3">
-        ➕ Add Medicine
-    </button>
-</form>
+                    <div class="mb-3">
+                        <label class="fw-semibold">Frequency</label>
+                        <input type="text" name="Frequency" class="form-control"
+                               placeholder="Eg: Morning & Night" required />
+                    </div>
 
-<!-- Display Medicines -->
-<h5 class="mt-4">📌 Prescribed Medicines</h5>
+                    <div class="mb-3">
+                        <label class="fw-semibold">Duration (Days)</label>
+                        <input type="number" name="DurationDays" class="form-control" min="1" required />
+                    </div>
 
-@if (ViewBag.MedicineList.Count == 0)
-{
-    <p class="text-muted">No medicines prescribed yet.</p>
-}
-else
-{
-    <table class="table table-bordered table-sm">
-        <tr class="table-dark">
-            <th>Medicine</th>
-            <th>Qty</th>
-            <th>Frequency</th>
-            <th>Days</th>
-        </tr>
+                    <button class="btn btn-primary w-100 shadow-sm">
+                        ➕ Add Medicine
+                    </button>
+                </form>
 
-        @foreach (var m in ViewBag.MedicineList)
-        {
-            <tr>
-                <td>@m.MedicineName</td>
-                <td>@m.Quantity</td>
-                <td>@m.Frequency</td>
-                <td>@m.DurationDays</td>
-            </tr>
-        }
-    </table>
-}
+                <!-- Prescribed Medicines -->
+                <h6 class="mt-4 fw-bold">📌 Prescribed Medicines</h6>
 
-<hr />
+                @if (ViewBag.MedicineList.Count == 0)
+                {
+                    <p class="text-muted">No medicines prescribed yet.</p>
+                }
+                else
+                {
+                    <table class="table table-sm table-hover mt-2">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Medicine</th>
+                                <th>Qty</th>
+                                <th>Frequency</th>
+                                <th>Days</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var m in ViewBag.MedicineList)
+                            {
+                                <tr>
+                                    <td>@m.MedicineName</td>
+                                    <td>@m.Quantity</td>
+                                    <td>@m.Frequency</td>
+                                    <td>@m.DurationDays</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
 
-<!-- ========================= -->
-<!-- ✅ Lab Prescription -->
-<!-- ========================= -->
-<h4 class="text-danger">🧪 Add Lab Tests</h4>
+            </div>
+        </div>
+    </div>
 
-<form asp-action="AddLabPrescription" method="post">
+    <!-- ============================= -->
+    <!-- 🧪 Lab Tests -->
+    <!-- ============================= -->
+    <div class="col-md-6 mb-4">
+        <div class="card shadow-sm border-0 rounded-4 h-100">
+            <div class="card-header bg-danger text-white rounded-top-4">
+                <h5 class="mb-0">🧪 Add Lab Tests</h5>
+            </div>
 
-    <input type="hidden" name="AppointmentId" value="@Model.AppointmentId" />
-    <input type="hidden" name="PatientId" value="@Model.PatientId" />
+            <div class="card-body">
 
-    <label><b>Select Lab Test</b></label>
-    <select name="TestId" class="form-control" required>
-        <option value="">-- Select Test --</option>
-        @foreach (var t in ViewBag.LabTests)
-        {
-            <option value="@t.TestId">@t.TestName</option>
-        }
-    </select>
+                <form asp-action="AddLabPrescription" method="post">
 
-    <label class="mt-2"><b>Quantity</b></label>
-    <input type="number" name="Quantity" class="form-control" min="1" required />
+                    <input type="hidden" name="AppointmentId" value="@Model.AppointmentId" />
+                    <input type="hidden" name="PatientId" value="@Model.PatientId" />
 
-    <button class="btn btn-danger mt-3">
-        ➕ Add Lab Test
-    </button>
-</form>
+                    <label class="fw-semibold">Select Lab Test (Optional)</label>
+                    <select name="TestId" class="form-select">
+                        <option value="">-- Select Test (If Needed) --</option>
+                        @foreach (var t in ViewBag.LabTests)
+                        {
+                            <option value="@t.TestId">@t.TestName</option>
+                        }
+                    </select>
 
-<!-- Display Lab Tests -->
-<h5 class="mt-4">📌 Prescribed Lab Tests</h5>
+                    <button class="btn btn-danger mt-3 w-100">
+                        ➕ Add Lab Test
+                    </button>
+                </form>
 
-@if (ViewBag.LabList.Count == 0)
-{
-    <p class="text-muted">No lab tests prescribed yet.</p>
-}
-else
-{
-    <table class="table table-bordered table-sm">
-        <tr class="table-dark">
-            <th>Test</th>
-            <th>Qty</th>
-            <th>Status</th>
-        </tr>
+                <!-- Prescribed Lab Tests -->
+                <h6 class="mt-4 fw-bold">📌 Prescribed Lab Tests</h6>
 
-        @foreach (var l in ViewBag.LabList)
-        {
-            <tr>
-                <td>@l.TestName</td>
-                <td>@l.Quantity</td>
-                <td>@l.Status</td>
-            </tr>
-        }
-    </table>
-}
+                @if (ViewBag.LabList.Count == 0)
+                {
+                    <p class="text-muted">No lab tests prescribed yet.</p>
+                }
+                else
+                {
+                    <table class="table table-sm table-hover mt-2">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Test Name</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var l in ViewBag.LabList)
+                            {
+                                <tr>
+                                    <td>@l.TestName</td>
+                                    <td>
+                                        <span class="badge bg-info">@l.Status</span>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
 
-<hr />
+            </div>
+        </div>
+    </div>
+</div>
 
-<!-- ========================= -->
+<!-- ============================= -->
 <!-- ✅ Patient History -->
-<!-- ========================= -->
-<h4>📜 Patient Consultation History</h4>
+<!-- ============================= -->
+<div class="card shadow-sm border-0 rounded-4 mb-4">
+    <div class="card-header bg-dark text-white rounded-top-4">
+        <h5 class="mb-0">📜 Patient Consultation History</h5>
+    </div>
 
-@if (ViewBag.History.Count == 0)
-{
-    <p class="text-muted">No previous consultation history found.</p>
-}
-else
-{
-    <table class="table table-bordered table-sm">
-        <tr class="table-dark">
-            <th>Date</th>
-            <th>Symptoms</th>
-            <th>Diagnosis</th>
-            <th>Notes</th>
-        </tr>
+    <div class="card-body">
 
-        @foreach (var h in ViewBag.History)
+        @if (ViewBag.History.Count == 0)
         {
-            <tr>
-                <td>@h.Date.ToShortDateString()</td>
-                <td>@h.Symptoms</td>
-                <td>@h.DiagnosisText</td>
-                <td>@h.DoctorNotes</td>
-            </tr>
+            <p class="text-muted">No previous consultation history found.</p>
         }
-    </table>
-}
+        else
+        {
+            <table class="table table-hover table-sm">
+                <thead class="table-light">
+                    <tr>
+                        <th>Date</th>
+                        <th>Symptoms</th>
+                        <th>Diagnosis</th>
+                        <th>Notes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var h in ViewBag.History)
+                    {
+                        <tr>
+                            <td>@h.Date.ToShortDateString()</td>
+                            <td>@h.Symptoms</td>
+                            <td>@h.DiagnosisText</td>
+                            <td>@h.DoctorNotes</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
 
-<hr />
+    </div>
+</div>
 
-<!-- ========================= -->
-<!-- ✅ FINAL COMPLETE CONSULTATION -->
-<!-- ========================= -->
-<h4 class="text-dark">✅ Finish Consultation</h4>
+<!-- ============================= -->
+<!-- ✅ Finish Consultation -->
+<!-- ============================= -->
+<div class="card shadow-lg border-0 rounded-4">
+    <div class="card-body text-center">
 
-<form asp-action="FinalSaveConsultation" method="post">
-    <input type="hidden" name="appointmentId" value="@Model.AppointmentId" />
-    <input type="hidden" name="patientId" value="@Model.PatientId" />
+        <form asp-action="FinalSaveConsultation" method="post">
+            <input type="hidden" name="appointmentId" value="@Model.AppointmentId" />
+            <input type="hidden" name="patientId" value="@Model.PatientId" />
 
-    <button class="btn btn-dark btn-lg w-100 mt-3">
-        ✅ Complete Consultation & Close Appointment
-    </button>
-</form>
+            <button class="btn btn-dark btn-lg w-100 shadow-sm">
+                ✅ Complete Consultation & Close Appointment
+            </button>
+        </form>
 
-<br />
+        <a asp-action="Index" class="btn btn-outline-secondary w-100 mt-3">
+            ⬅ Back to Dashboard
+        </a>
 
-<a asp-action="Index" class="btn btn-secondary w-100">
-    ⬅ Back to Dashboard
-</a>
+    </div>
+</div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />

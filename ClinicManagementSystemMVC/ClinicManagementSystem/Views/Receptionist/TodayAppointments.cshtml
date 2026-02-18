@@ -104,21 +104,41 @@
                 </div>
 
                 <div class="modal-body">
+
+                    <!-- Select Patient -->
                     <div class="mb-3">
                         <label class="form-label">Select Patient</label>
-                        @Html.DropDownList("patientId",
-                        new SelectList(ViewBag.Patients, "PatientId", "PatientName"),
+                        @Html.DropDownList(
+                        "patientId",
+                                                new SelectList(ViewBag.Patients, "PatientId", "PatientName"),
                                                 "-- Select Patient --",
-                                                new { @class = "form-select", required = "required" })
+                                                new { @class = "form-select", required = "required" }
+                                                )
                     </div>
 
+                    <!-- Select Date -->
+                    <div class="mb-3">
+                        <label class="form-label">Select Date</label>
+                        <input type="date"
+                               id="slotDate"
+                               name="slotDate"
+                               class="form-control"
+                               min="@DateTime.Today.ToString("yyyy-MM-dd")"
+                               value="@ViewBag.SelectedDate"
+                               required />
+                    </div>
+
+                    <!-- Select Slot -->
                     <div class="mb-3">
                         <label class="form-label">Select Slot</label>
-                        @Html.DropDownList("slotId",
-                                                new SelectList(ViewBag.Slots, "SlotId", "DisplayText"),
-                                                "-- Select Slot --",
-                                                new { @class = "form-select", required = "required" })
+                        <select id="slotId"
+                                name="slotId"
+                                class="form-select"
+                                required>
+                            <option value="">-- Select Slot --</option>
+                        </select>
                     </div>
+
                 </div>
 
                 <div class="modal-footer">
@@ -129,4 +149,33 @@
         </div>
     </div>
 </div>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const dateInput = document.getElementById("slotDate");
+        const slotDropdown = document.getElementById("slotId");
+
+        if (!dateInput || !slotDropdown) return;
+
+        dateInput.addEventListener("change", function () {
+
+            const date = this.value;
+            slotDropdown.innerHTML = '<option value="">-- Select Slot --</option>';
+
+            if (!date) return;
+
+            fetch(`/Receptionist/GetSlotsByDate?slotDate=${date}`)
+                .then(res => res.json())
+                .then(data => {
+                    data.forEach(s => {
+                        const opt = document.createElement("option");
+                        opt.value = s.slotId;
+                        opt.textContent = s.text;
+                        slotDropdown.appendChild(opt);
+                    });
+                });
+        });
+    });
+</script>
+
 <!--Billiing-->

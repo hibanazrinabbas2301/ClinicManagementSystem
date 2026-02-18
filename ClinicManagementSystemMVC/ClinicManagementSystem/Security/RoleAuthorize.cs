@@ -14,16 +14,39 @@ namespace ClinicManagementSystem.Security
 
         public override void OnActionExecuting(ActionExecutingContext context)
         {
+            // ✅ Prevent browser caching (important for Back button)
+            context.HttpContext.Response.Headers["Cache-Control"] =
+                "no-cache, no-store, must-revalidate";
+            context.HttpContext.Response.Headers["Pragma"] = "no-cache";
+            context.HttpContext.Response.Headers["Expires"] = "0";
+
+            // ✅ Check Session Exists
+            var staffId = context.HttpContext.Session.GetInt32("StaffId");
             var role = context.HttpContext.Session.GetString("RoleName");
 
-            if (role == null || role != _role)
+            // ✅ If user is logged out → block access immediately
+            if (staffId == null || role == null)
             {
                 context.Result = new RedirectToActionResult(
-                    "Login",
-                    "Account",
+                    "Index",   // Login page action
+                    "Login",   // LoginController
                     null
                 );
+                return;
             }
+
+            // ✅ Role mismatch → block access
+            if (role != _role)
+            {
+                context.Result = new RedirectToActionResult(
+                    "Index",
+                    "Login",
+                    null
+                );
+                return;
+            }
+
+            base.OnActionExecuting(context);
         }
     }
 }

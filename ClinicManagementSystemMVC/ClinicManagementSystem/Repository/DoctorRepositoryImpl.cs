@@ -1,4 +1,5 @@
 ﻿using ClinicManagementSystem.Models;
+using ClinicManagementSystem.View_Model;
 using Microsoft.Data.SqlClient;
 using System.Data;
 
@@ -280,6 +281,47 @@ namespace ClinicManagementSystem.Repositories
 
             return list;
         }
+        public PatientBasicInfo GetPatientBasicDetails(int patientId)
+        {
+            PatientBasicInfo patient = null;
+
+            using SqlConnection con = new SqlConnection(_ConnectionString);
+
+            SqlCommand cmd = new SqlCommand(
+                @"SELECT 
+            Name AS PatientName,
+            Gender,
+            DOB,
+            BloodGroup
+          FROM Patient
+          WHERE PatientId = @PatientId", con);
+
+            cmd.Parameters.AddWithValue("@PatientId", patientId);
+
+            con.Open();
+            SqlDataReader dr = cmd.ExecuteReader();
+
+            if (dr.Read())
+            {
+                DateTime dob = Convert.ToDateTime(dr["DOB"]);
+
+                // ✅ Calculate Age
+                int age = DateTime.Now.Year - dob.Year;
+                if (dob.Date > DateTime.Now.AddYears(-age))
+                    age--;
+
+                patient = new PatientBasicInfo()
+                {
+                    PatientName = dr["PatientName"].ToString(), // ✅ Alias Works
+                    Gender = dr["Gender"].ToString(),
+                    BloodGroup = dr["BloodGroup"].ToString(),
+                    Age = age
+                };
+            }
+
+            return patient;
+        }
+
 
 
         // =====================================================

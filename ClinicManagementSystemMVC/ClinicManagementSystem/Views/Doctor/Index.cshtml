@@ -4,114 +4,196 @@
     ViewData["Title"] = "Doctor Dashboard";
 }
 
-<h2 class="mb-4">👨‍⚕️ Doctor Dashboard - Today's Appointments</h2>
+<!-- ============================= -->
+<!-- ✅ Doctor Dashboard Header -->
+<!-- ============================= -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="fw-bold text-primary">
+            👨‍⚕️ Doctor Dashboard
+        </h2>
+        <p class="text-muted mb-0">
+            Today's Appointments Overview - @DateTime.Now.ToString("dddd, dd MMM yyyy")
+        </p>
+    </div>
 
-<!-- Alerts -->
+    <span class="badge bg-dark fs-6 px-3 py-2 shadow-sm">
+        Total Appointments: @Model.Count
+    </span>
+</div>
+
+<hr />
+
+<!-- ============================= -->
+<!-- ✅ Alerts -->
+<!-- ============================= -->
 @if (TempData["Success"] != null)
 {
-    <div class="alert alert-success">
-        @TempData["Success"]
+    <div class="alert alert-success alert-dismissible fade show shadow-sm">
+        <strong>Success:</strong> @TempData["Success"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     </div>
 }
 
 @if (TempData["Error"] != null)
 {
-    <div class="alert alert-danger">
-        @TempData["Error"]
+    <div class="alert alert-danger alert-dismissible fade show shadow-sm">
+        <strong>Error:</strong> @TempData["Error"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     </div>
 }
 
-<hr />
-
-<!-- ✅ No Appointments Case -->
+<!-- ============================= -->
+<!-- ✅ No Appointments -->
+<!-- ============================= -->
 @if (Model.Count == 0)
 {
-    <div class="alert alert-info text-center">
-        No appointments scheduled for today.
+    <div class="alert alert-info text-center shadow-sm p-4">
+        <h5 class="mb-2">📌 No Appointments Today</h5>
+        <p class="mb-0">You have no scheduled consultations for today.</p>
     </div>
 }
 else
 {
-    <table class="table table-bordered table-hover table-striped shadow">
+    <!-- ============================= -->
+    <!-- ✅ Appointment Summary Cards -->
+    <!-- ============================= -->
+    <div class="row mb-4">
 
-        <thead class="table-dark text-center">
-            <tr>
-                <th>Token</th>
-                <th>Patient Name</th>
-                <th>Time Slot</th>
-                <th>Status</th>
-                <th>Action</th>
-            </tr>
-        </thead>
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0 rounded-4 p-3">
+                <h6 class="text-muted">Upcoming</h6>
+                <h3 class="fw-bold text-success">
+                    @Model.Count(x => x.Status == "Upcoming")
+                </h3>
+            </div>
+        </div>
 
-        <tbody>
-            @foreach (var item in Model)
-            {
-                string rowClass = item.Status == "Expired"
-                ? "table-danger"
-                : "table-success";
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0 rounded-4 p-3">
+                <h6 class="text-muted">Completed</h6>
+                <h3 class="fw-bold text-primary">
+                    @Model.Count(x => x.Status == "Completed")
+                </h3>
+            </div>
+        </div>
 
-                <tr class="@rowClass text-center">
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0 rounded-4 p-3">
+                <h6 class="text-muted">Expired</h6>
+                <h3 class="fw-bold text-danger">
+                    @Model.Count(x => x.Status == "Expired")
+                </h3>
+            </div>
+        </div>
 
-                    <!-- Token -->
-                    <td>
-                        <b>@item.TokenNumber</b>
-                    </td>
+    </div>
 
-                    <!-- Patient -->
-                    <td>
-                        @item.PatientName
-                    </td>
+    <!-- ============================= -->
+    <!-- ✅ Professional Appointment Table -->
+    <!-- ============================= -->
+    <div class="card shadow-lg border-0 rounded-4">
+        <div class="card-header bg-primary text-white rounded-top-4">
+            <h5 class="mb-0">📋 Appointment Schedule</h5>
+        </div>
 
-                    <!-- Slot -->
-                    <td>
-                        @item.StartTime - @item.EndTime
-                    </td>
+        <div class="card-body p-0">
 
-                    <!-- Status -->
-                    <td>
-                        @if (item.Status == "Expired")
-                        {
-                            <span class="badge bg-danger">
-                                Expired
-                            </span>
-                        }
-                        else
-                        {
-                            <span class="badge bg-success">
-                                Upcoming
-                            </span>
-                        }
-                    </td>
+            <table class="table table-hover align-middle mb-0">
 
-                    <!-- Action -->
-                    <td>
-                        @if (item.Status == "Completed")
-                        {
-                            <button class="btn btn-success btn-sm" disabled>
-                                ✅ Consulted
-                            </button>
-                        }
-                        else if (item.Status == "Upcoming")
-                        {
-                            <a class="btn btn-primary btn-sm"
-                               asp-action="Consultation"
-                               asp-route-appointmentId="@item.AppointmentId"
-                               asp-route-patientId="@item.PatientId">
-                                Consult
-                            </a>
-                        }
-                        else
-                        {
-                            <button class="btn btn-secondary btn-sm" disabled>
-                                Expired
-                            </button>
-                        }
+                <thead class="table-light text-center">
+                    <tr>
+                        <th>Token</th>
+                        <th>Patient Name</th>
+                        <th>Time Slot</th>
+                        <th>Status</th>
+                        <th style="width:180px;">Action</th>
+                    </tr>
+                </thead>
 
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        string rowClass = item.Status == "Expired"
+                        ? "table-danger"
+                        : item.Status == "Completed"
+                        ? "table-secondary"
+                        : "";
 
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
+                        <tr class="@rowClass text-center">
+
+                            <!-- Token -->
+                            <td>
+                                <span class="fw-bold text-dark">
+                                    @item.TokenNumber
+                                </span>
+                            </td>
+
+                            <!-- Patient -->
+                            <td class="fw-semibold">
+                                @item.PatientName
+                            </td>
+
+                            <!-- Slot -->
+                            <td>
+                                <span class="text-muted">
+                                    @item.StartTime - @item.EndTime
+                                </span>
+                            </td>
+
+                            <!-- Status -->
+                            <td>
+                                @if (item.Status == "Expired")
+                                {
+                                    <span class="badge bg-danger px-3 py-2 rounded-pill">
+                                        Expired
+                                    </span>
+                                }
+                                else if (item.Status == "Completed")
+                                {
+                                    <span class="badge bg-secondary px-3 py-2 rounded-pill">
+                                        Completed
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-success px-3 py-2 rounded-pill">
+                                        Upcoming
+                                    </span>
+                                }
+                            </td>
+
+                            <!-- Action -->
+                            <td>
+                                @if (item.Status == "Completed")
+                                {
+                                    <button class="btn btn-success btn-sm w-100" disabled>
+                                        ✅ Consulted
+                                    </button>
+                                }
+                                else if (item.Status == "Upcoming")
+                                {
+                                    <a class="btn btn-primary btn-sm w-100 shadow-sm"
+                                       asp-action="Consultation"
+                                       asp-route-appointmentId="@item.AppointmentId"
+                                       asp-route-patientId="@item.PatientId">
+                                        🩺 Start Consultation
+                                    </a>
+                                }
+                                else
+                                {
+                                    <button class="btn btn-outline-secondary btn-sm w-100" disabled>
+                                        ⛔ Expired
+                                    </button>
+                                }
+                            </td>
+
+                        </tr>
+                    }
+                </tbody>
+
+            </table>
+
+        </div>
+    </div>
 }

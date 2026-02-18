@@ -1,9 +1,12 @@
 ﻿using ClinicManagementSystem.Models;
+using ClinicManagementSystem.Security;
 using ClinicManagementSystem.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ClinicManagementSystem.Controllers
 {
+    [RoleAuthorize("Doctor")]
+
     public class DoctorController : Controller
     {
         private readonly IDoctorService _service;
@@ -18,6 +21,7 @@ namespace ClinicManagementSystem.Controllers
         // ===============================
         public IActionResult Index()
         {
+
             int doctorId = Convert.ToInt32(HttpContext.Session.GetInt32("StaffId"));
 
             var appointments = _service.GetTodaysAppointments(doctorId);
@@ -40,6 +44,8 @@ namespace ClinicManagementSystem.Controllers
 
             // Patient History
             ViewBag.History = _service.GetPatientHistory(patientId);
+            ViewBag.PatientInfo = _service.GetPatientBasicDetails(patientId);
+
 
             // ✅ Load Existing Diagnosis (if already saved)
             Diagnosis model = _service.GetDiagnosisByAppointment(appointmentId);
@@ -111,12 +117,14 @@ namespace ClinicManagementSystem.Controllers
         {
             if (model.TestId == 0 || model.Quantity <= 0)
             {
-                TempData["Error"] = "⚠ Please select lab test and enter quantity!";
+                TempData["Error"] = "⚠ Please select lab test before adding!";
                 return RedirectToAction("Consultation",
                     new { appointmentId = model.AppointmentId, patientId = model.PatientId });
             }
 
             model.DoctorId = Convert.ToInt32(HttpContext.Session.GetInt32("StaffId"));
+            model.Quantity = 1;
+
 
             _service.AddLabPrescription(model);
 

@@ -1,9 +1,12 @@
-﻿using ClinicManagementSystem.Services;
+﻿using ClinicManagementSystem.Security;
+using ClinicManagementSystem.Services;
 using ClinicManagementSystem.ViewModel;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ClinicManagementSystem.Controllers
 {
+    [RoleAuthorize("Pharmacist")]
+
     public class PharmacistController : Controller
     {
         private readonly IpharmacistService _pharmacistService;
@@ -15,6 +18,8 @@ namespace ClinicManagementSystem.Controllers
 
         public IActionResult Index()
         {
+            
+
             var medicines = _pharmacistService.GetAllMedicines();
             return View(medicines);
         }

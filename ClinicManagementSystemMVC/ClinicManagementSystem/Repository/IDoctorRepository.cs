@@ -1,4 +1,5 @@
 ﻿using ClinicManagementSystem.Models;
+using ClinicManagementSystem.View_Model;
 
 namespace ClinicManagementSystem.Repositories
 {
@@ -41,6 +42,8 @@ namespace ClinicManagementSystem.Repositories
         // Patient History
         // ===============================
         List<Diagnosis> GetPatientHistory(int patientId);
+        PatientBasicInfo GetPatientBasicDetails(int patientId);
+
 
         // ===============================
         // Appointment Completion

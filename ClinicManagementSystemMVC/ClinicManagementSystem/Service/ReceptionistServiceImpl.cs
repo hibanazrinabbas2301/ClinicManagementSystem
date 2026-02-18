@@ -56,11 +56,10 @@ namespace ClinicManagementSystem.Services
                 return _receptionistRepository.GetAllPatients();
             }
 
-            public List<ClinicManagementSystem_Final.Models.AppointmentViewModel> GetAppointments()
+            public List<AppointmentViewModel> GetAppointmentsByDate(DateTime slotDate)
             {
-                return _receptionistRepository.GetAppointments();
+                return _receptionistRepository.GetAppointmentsByDate(slotDate);
             }
-
             public int BookAppointment(int slotId, int patientId)
             {
                 return _receptionistRepository.BookAppointment(slotId, patientId);
@@ -79,6 +78,11 @@ namespace ClinicManagementSystem.Services
         public List<ClinicManagementSystem_Final.Models.SlotViewModel> GetAvailableSlots()
         {
             return _receptionistRepository.GetAvailableSlots();
+        }
+
+        public List<SlotViewModel> GetAvailableDoctorSlots(DateTime slotDate)
+        {
+            return _receptionistRepository.GetAvailableDoctorSlots(slotDate);
         }
     }
     }

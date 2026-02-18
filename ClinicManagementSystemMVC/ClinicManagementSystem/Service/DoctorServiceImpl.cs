@@ -1,5 +1,6 @@
 ﻿using ClinicManagementSystem.Models;
 using ClinicManagementSystem.Repositories;
+using ClinicManagementSystem.View_Model;
 
 namespace ClinicManagementSystem.Services
 {
@@ -69,7 +70,10 @@ namespace ClinicManagementSystem.Services
         {
             return _repo.GetPatientHistory(patientId);
         }
-
+        public PatientBasicInfo GetPatientBasicDetails(int patientId)
+        {
+            return _repo.GetPatientBasicDetails(patientId);
+        }
         // ===============================
         // Appointment Completion
         // ===============================

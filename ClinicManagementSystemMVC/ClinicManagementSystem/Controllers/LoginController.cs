@@ -20,24 +20,31 @@ namespace ClinicManagementSystem.Controllers
             return View();
         }
 
-        // ✅ POST: Login Submit
         [HttpPost]
-        public IActionResult Login(UserModel model)
+        public IActionResult Index(UserModel model)
         {
-            var user = _service.AuthenticateLogin(model.UserName, model.UserPassword);
-
-            if (user == null)
+            // ✅ Step 1: Required field validation
+            if (!ModelState.IsValid)
             {
-                ViewBag.Error = "Invalid Username or Password!";
-                return View("Index"); // ✅ Fix
+                return View(model);
             }
 
-            // ✅ Store Session
+            // ✅ Step 2: Authenticate user
+            var user = _service.AuthenticateLogin(model.UserName, model.UserPassword);
+
+            // ❌ Wrong credentials
+            if (user == null)
+            {
+                ViewBag.Error = "❌ Wrong Username or Password!";
+                return View(model);   // ✅ Stay on login page
+            }
+
+            // ✅ Step 3: Store Session
             HttpContext.Session.SetInt32("StaffId", user.StaffId);
             HttpContext.Session.SetString("RoleName", user.RoleName);
             HttpContext.Session.SetString("UserName", user.Name);
 
-            // ✅ Redirect Role Dashboard
+            // ✅ Step 4: Redirect Role Dashboard
             if (user.RoleName == "Receptionist")
                 return RedirectToAction("Index", "Receptionist");
 
@@ -48,17 +55,22 @@ namespace ClinicManagementSystem.Controllers
                 return RedirectToAction("Index", "Home");
 
             if (user.RoleName == "Lab Technician")
-                return RedirectToAction("LabTechDashBoard", "LabTechnicians"); // ✅ Fix
+                return RedirectToAction("LabTechDashBoard", "LabTechnicians");
 
-            // Default fallback
             return RedirectToAction("Index");
         }
+    
+
 
         // ✅ Logout
         public IActionResult Logout()
         {
             HttpContext.Session.Clear();
-            return RedirectToAction("Index"); // ✅ Fix
+            Response.Headers["Cache-Control"] = "no-cache, no-store, must-revalidate";
+            Response.Headers["Pragma"] = "no-cache";
+            Response.Headers["Expires"] = "0";
+
+            return RedirectToAction("Index","Login"); // ✅ Fix
         }
     }
 }

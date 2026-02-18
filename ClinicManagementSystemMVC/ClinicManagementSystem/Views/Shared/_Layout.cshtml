@@ -3,47 +3,132 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
     <title>@ViewData["Title"] - ClinicManagementSystem</title>
+
+    <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+
+    <!-- Site CSS -->
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/ClinicManagementSystem.styles.css" asp-append-version="true" />
 </head>
+
 <body>
+
+    <!-- ============================= -->
+    <!-- ✅ Navbar Header -->
+    <!-- ============================= -->
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">ClinicManagementSystem</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
+
+                <!-- Brand -->
+                <a class="navbar-brand fw-bold text-primary"
+                   asp-area=""
+                   asp-controller="Home"
+                   asp-action="Index">
+                    🏥 Clinic Management System
+                </a>
+
+                <!-- Mobile Toggle -->
+                <button class="navbar-toggler" type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target=".navbar-collapse"
+                        aria-controls="navbarSupportedContent"
+                        aria-expanded="false"
+                        aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
+
+                <!-- Navbar Content -->
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+
+                    <!-- ============================= -->
+                    <!-- Left Menu -->
+                    <!-- ============================= -->
                     <ul class="navbar-nav flex-grow-1">
+
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                            <a class="nav-link text-dark"
+                               asp-area=""
+                               asp-controller="Home"
+                               asp-action="Index">
+                                Home
+                            </a>
                         </li>
+
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                            <a class="nav-link text-dark"
+                               asp-area=""
+                               asp-controller="Home"
+                               asp-action="Privacy">
+                                Privacy
+                            </a>
                         </li>
+
                     </ul>
+
+                    <!-- ============================= -->
+                    <!-- Right Menu (User + Logout) -->
+                    <!-- ============================= -->
+                    <ul class="navbar-nav">
+
+                        @if (Context.Session.GetString("UserName") != null)
+                        {
+                            <!-- Username Display -->
+                            <li class="nav-item me-3">
+                                <span class="nav-link fw-bold text-primary">
+                                    👋 @Context.Session.GetString("UserName")
+                                </span>
+                            </li>
+
+                            <!-- Logout Button -->
+                            <li class="nav-item">
+                                <a class="btn btn-outline-danger btn-sm mt-1"
+                                   asp-controller="Login"
+                                   asp-action="Logout">
+                                    🚪 Logout
+                                </a>
+                            </li>
+                        }
+
+                    </ul>
+
                 </div>
             </div>
         </nav>
     </header>
+
+    <!-- ============================= -->
+    <!-- ✅ Main Page Content -->
+    <!-- ============================= -->
     <div class="container">
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
     </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2026 - ClinicManagementSystem - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+    <!-- ============================= -->
+    <!-- ✅ Footer -->
+    <!-- ============================= -->
+    <footer class="border-top footer text-muted mt-4">
+        <div class="container text-center">
+            &copy; 2026 - Clinic Management System |
+            <a asp-area="" asp-controller="Home" asp-action="Privacy">
+                Privacy Policy
+            </a>
         </div>
     </footer>
+
+    <!-- ============================= -->
+    <!-- Scripts -->
+    <!-- ============================= -->
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+
     @await RenderSectionAsync("Scripts", required: false)
+
 </body>
 </html>

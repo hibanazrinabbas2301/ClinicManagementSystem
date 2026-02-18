@@ -12,7 +12,7 @@
 
         public string TestName { get; set; }
 
-        public int Quantity { get; set; }
+        public int Quantity { get; set; } = 1;
 
         public DateTime PrescribedDate { get; set; }
 

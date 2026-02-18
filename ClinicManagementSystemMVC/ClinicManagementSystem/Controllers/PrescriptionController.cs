@@ -1,4 +1,5 @@
-﻿using ClinicManagementSystem.Services;
+﻿using ClinicManagementSystem.Security;
+using ClinicManagementSystem.Services;
 using ClinicManagementSystem.ViewModel;
 using Microsoft.AspNetCore.Mvc;
 
@@ -6,6 +7,7 @@ namespace ClinicManagementSystem.Controllers
 {
     public class PrescriptionController : Controller
     {
+
         private readonly IpharmacistService _pharmacistService;
 
         public PrescriptionController(IpharmacistService pharmacistService)
@@ -16,6 +18,8 @@ namespace ClinicManagementSystem.Controllers
         // Pending list
         public IActionResult Index()
         {
+            
+
             var data = _pharmacistService.GetPendingAppointments();
             return View(data);
         }
