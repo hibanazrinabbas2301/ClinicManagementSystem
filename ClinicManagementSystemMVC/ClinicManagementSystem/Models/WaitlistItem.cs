@@ -1,4 +1,4 @@
-﻿namespace ClinicManagementSystem_Final.Models
+﻿namespace ClinicManagementSystem.Models
 {
     public class WaitlistItem
     {

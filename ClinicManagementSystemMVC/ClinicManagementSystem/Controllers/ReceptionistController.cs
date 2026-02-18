@@ -1,7 +1,6 @@
 ﻿using ClinicManagementSystem.Models;
 using ClinicManagementSystem.Security;
 using ClinicManagementSystem.Services;
-using ClinicManagementSystem_Final.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ClinicManagementSystem_Final.Controllers
@@ -102,7 +101,7 @@ namespace ClinicManagementSystem_Final.Controllers
         [HttpGet]
         public IActionResult TodayAppointments(DateTime? slotDate)
         {
-            var date = slotDate ?? DateTime.Today;   // ✅ default TODAY (not tomorrow)
+            var date = slotDate ?? DateTime.Today;   
 
             ViewBag.SelectedDate = date.ToString("yyyy-MM-dd");
 
@@ -161,21 +160,30 @@ namespace ClinicManagementSystem_Final.Controllers
         [HttpPost]
         public IActionResult GenerateConsultationBill(int patientId, int appointmentId, decimal consultationFee)
         {
-            Console.WriteLine($"Generating bill for Patient={patientId}, Appointment={appointmentId}, Fee={consultationFee}");
-
-            bool success = _receptionistService.GenerateConsultationBill(patientId, appointmentId, consultationFee);
-
-            if (success)
+            // Ignore consultationFee for now because SP calculates from Doctor table
+            bool success = _receptionistService.GenerateConsultationBill(appointmentId);
+            if (!success)
             {
-                TempData["Message"] = "Consultation bill generated successfully!";
-                return RedirectToAction("ViewConsultationBill", new { patientId, appointmentId });
+                TempData["ErrorMessage"] = "Failed to generate consultation bill.";
+                return RedirectToAction(nameof(TodayAppointments));
             }
-            else
-            {
-                TempData["Error"] = "Failed to generate consultation bill.";
-                return View("GenerateConsultationBill");
-            }
+
+            return RedirectToAction(nameof(ViewConsultationBill), new { appointmentId });
         }
+
+        [HttpGet]
+        public IActionResult ViewConsultationBill(int appointmentId)
+        {
+            var bill = _receptionistService.GetConsultationBillDetails(appointmentId);
+            if (bill == null)
+            {
+                TempData["ErrorMessage"] = "Bill not found for this appointment.";
+                return RedirectToAction(nameof(TodayAppointments));
+            }
+
+            return View(bill); // must have Views/Receptionist/ViewConsultationBill.cshtml
+        }
+
         [HttpGet]
         public JsonResult GetSlotsByDate(DateTime slotDate)
         {
@@ -188,6 +196,7 @@ namespace ClinicManagementSystem_Final.Controllers
 
             return Json(data);
         }
+
 
 
     }

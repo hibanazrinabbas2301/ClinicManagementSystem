@@ -1,5 +1,4 @@
 ﻿using ClinicManagementSystem.Models;
-using ClinicManagementSystem_Final.Models;
 
 namespace ClinicManagementSystem_Final.Repository
 {
@@ -22,8 +21,8 @@ namespace ClinicManagementSystem_Final.Repository
         List<AppointmentViewModel> GetAppointmentsByDate(DateTime slotDate);
 
         int BookAppointment(int slotId, int patientId);
-        public bool GenerateConsultationBill(int patientId, int appointmentId, decimal fee);
-        BillViewModel GetConsultationBillDetails(int patientId, int appointmentId);
+        bool GenerateConsultationBill(int appointmentId);
+        BillViewModel GetConsultationBillDetails(int appointmentId);
 
         List<SlotViewModel> GetAvailableSlots();
         List<SlotViewModel> GetAvailableDoctorSlots(DateTime slotDate);

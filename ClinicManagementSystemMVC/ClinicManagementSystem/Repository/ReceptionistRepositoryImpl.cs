@@ -1,6 +1,5 @@
 ﻿
 using ClinicManagementSystem.Models;
-using ClinicManagementSystem_Final.Models;
 using ClinicManagementSystem_Final.Repository;
 using Microsoft.Data.SqlClient;
 using System.Data;
@@ -319,120 +318,50 @@ namespace ClinicManagementSystem.Repositories
             }
         }
 
-        public bool GenerateConsultationBill(int patientId, int appointmentId, decimal consultationFee)
+        public bool GenerateConsultationBill(int appointmentId)
         {
-            try
+            using (SqlConnection con = new SqlConnection(_connectionString))
+            using (SqlCommand cmd = new SqlCommand("sp_GenerateConsultationBill", con))
             {
-                using (SqlConnection con = new SqlConnection(_connectionString))
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@AppointmentId", appointmentId);
+
+                con.Open();
+                using (SqlDataReader reader = cmd.ExecuteReader())
                 {
-                    con.Open();
-
-                    // 🔹 Step 1: Check if a bill already exists for this appointment
-                    string checkQuery = "SELECT COUNT(*) FROM Bill WHERE AppointmentId = @AppointmentId AND BillType = 'Consultation'";
-                    using (SqlCommand checkCmd = new SqlCommand(checkQuery, con))
-                    {
-                        checkCmd.Parameters.AddWithValue("@AppointmentId", appointmentId);
-                        int count = Convert.ToInt32(checkCmd.ExecuteScalar());
-                        if (count > 0)
-                        {
-                            Console.WriteLine("Bill already exists for this appointment.");
-                            return false;
-                        }
-                    }
-
-                    // 🔹 Step 2: Insert into Bill table
-                    string billQuery = @"
-                        INSERT INTO Bill (PatientId, AppointmentId, BillType, TotalAmount, BillDate, Paid)
-                        VALUES (@PatientId, @AppointmentId, 'Consultation', @TotalAmount, GETDATE(), 0);
-                        SELECT SCOPE_IDENTITY();";
-
-                    int billId;
-                    using (SqlCommand cmd = new SqlCommand(billQuery, con))
-                    {
-                        cmd.Parameters.AddWithValue("@PatientId", patientId);
-                        cmd.Parameters.AddWithValue("@AppointmentId", appointmentId);
-                        cmd.Parameters.AddWithValue("@TotalAmount", consultationFee);
-
-                        billId = Convert.ToInt32(cmd.ExecuteScalar());
-                    }
-
-                    // 🔹 Step 3: Insert into BillDetails table
-                    string detailQuery = @"
-                        INSERT INTO BillDetails (BillId, ItemType, Quantity, UnitPrice, Amount)
-                        VALUES (@BillId, 'Consultation Fee', 1, @ConsultationFee, @ConsultationFee)";
-
-                    using (SqlCommand cmd2 = new SqlCommand(detailQuery, con))
-                    {
-                        cmd2.Parameters.AddWithValue("@BillId", billId);
-                        cmd2.Parameters.AddWithValue("@ConsultationFee", consultationFee);
-                        cmd2.ExecuteNonQuery();
-                    }
-
-                    return true;
+                    // If SP returned a row -> success
+                    return reader.Read();
                 }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("❌ Error generating consultation bill: " + ex.Message);
-                return false;
             }
         }
 
         //  Method 2: Get Consultation Bill Details
-        public BillViewModel GetConsultationBillDetails(int patientId, int appointmentId)
+        public BillViewModel GetConsultationBillDetails(int appointmentId)
         {
-            BillViewModel bill = null;
-
-            try
+            using (SqlConnection con = new SqlConnection(_connectionString))
+            using (SqlCommand cmd = new SqlCommand("sp_GenerateConsultationBill", con))
             {
-                using (SqlConnection con = new SqlConnection(_connectionString))
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@AppointmentId", appointmentId);
+
+                con.Open();
+                using (SqlDataReader reader = cmd.ExecuteReader())
                 {
-                    string query = @"
-                        SELECT TOP 1 
-                            b.BillId,
-                            p.Name AS PatientName,
-                            s.Name AS DoctorName,
-                            a.AppointmentDate,
-                            b.TotalAmount,
-                            b.Paid
-                        FROM Bill b
-                        INNER JOIN Appointment a ON b.AppointmentId = a.AppointmentId
-                        INNER JOIN Patient p ON b.PatientId = p.PatientId
-                        INNER JOIN Doctor d ON a.DoctorId = d.DoctorId
-                        INNER JOIN Staff s ON d.StaffId = s.StaffId
-                        WHERE b.PatientId = @PatientId AND b.AppointmentId = @AppointmentId
-                        ORDER BY b.BillDate DESC;";
+                    if (!reader.Read()) return null;
 
-                    using (SqlCommand cmd = new SqlCommand(query, con))
+                    return new BillViewModel
                     {
-                        cmd.Parameters.AddWithValue("@PatientId", patientId);
-                        cmd.Parameters.AddWithValue("@AppointmentId", appointmentId);
-
-                        con.Open();
-                        using (SqlDataReader reader = cmd.ExecuteReader())
-                        {
-                            if (reader.Read())
-                            {
-                                bill = new BillViewModel
-                                {
-                                    BillId = Convert.ToInt32(reader["BillId"]),
-                                    PatientName = reader["PatientName"].ToString(),
-                                    DoctorName = reader["DoctorName"].ToString(),
-                                    AppointmentDate = Convert.ToDateTime(reader["AppointmentDate"]),
-                                    TotalAmount = Convert.ToDecimal(reader["TotalAmount"]),
-                                    Paid = Convert.ToBoolean(reader["Paid"])
-                                };
-                            }
-                        }
-                    }
+                        AppointmentId = Convert.ToInt32(reader["AppointmentId"]),
+                        PatientName = reader["PatientName"].ToString(),
+                        DoctorName = reader["DoctorName"].ToString(),
+                        AppointmentDate = Convert.ToDateTime(reader["AppointmentDate"]),
+                        TotalAmount = Convert.ToDecimal(reader["ConsultationBill"]),
+                        BillType = "Consultation",
+                        BillDate = DateTime.Now,
+                        Paid = false
+                    };
                 }
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Error fetching consultation bill details: " + ex.Message);
-            }
-
-            return bill;
         }
 
         public List<SlotViewModel> GetAvailableSlots()

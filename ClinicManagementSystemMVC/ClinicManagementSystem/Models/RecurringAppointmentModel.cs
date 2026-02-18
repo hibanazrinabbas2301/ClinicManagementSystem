@@ -1,4 +1,4 @@
-﻿namespace ClinicManagementSystem_Final.Models
+﻿namespace ClinicManagementSystem.Models
 {
     public class RecurringAppointmentModel               //For Paient to book recurring appointments with a doctor (e.g., for regular check-ups or therapy sessions)
     {

@@ -1,6 +1,5 @@
 ﻿
 using ClinicManagementSystem.Models;
-using ClinicManagementSystem_Final.Models;
 using ClinicManagementSystem_Final.Repository;
 
 namespace ClinicManagementSystem.Services
@@ -65,24 +64,30 @@ namespace ClinicManagementSystem.Services
                 return _receptionistRepository.BookAppointment(slotId, patientId);
             }
 
-            public bool GenerateConsultationBill(int patientId, int appointmentId, decimal consultationFee)
+            public bool GenerateConsultationBill(int appointmentId)
             {
-                return _receptionistRepository.GenerateConsultationBill(patientId, appointmentId, consultationFee);
+                return _receptionistRepository.GenerateConsultationBill(appointmentId);
             }
 
-            public ClinicManagementSystem_Final.Models.BillViewModel GetConsultationBillDetails(int patientId, int appointmentId)
+                 
+            public BillViewModel GetConsultationBillDetails(int appointmentId)
+
             {
-                return _receptionistRepository.GetConsultationBillDetails(patientId, appointmentId);
+                return _receptionistRepository.GetConsultationBillDetails(appointmentId);
             }
 
-        public List<ClinicManagementSystem_Final.Models.SlotViewModel> GetAvailableSlots()
-        {
-            return _receptionistRepository.GetAvailableSlots();
-        }
 
-        public List<SlotViewModel> GetAvailableDoctorSlots(DateTime slotDate)
-        {
-            return _receptionistRepository.GetAvailableDoctorSlots(slotDate);
+      
+
+            public List<SlotViewModel> GetAvailableSlots()
+            {
+                return _receptionistRepository.GetAvailableSlots();
+            }
+
+
+            public List<SlotViewModel> GetAvailableDoctorSlots(DateTime slotDate)
+            {
+                return _receptionistRepository.GetAvailableDoctorSlots(slotDate);
+            }
         }
-    }
     }
