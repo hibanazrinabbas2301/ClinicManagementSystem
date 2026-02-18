@@ -63,24 +63,24 @@ namespace ClinicManagementSystem_Final.Service
                 return _receptionistRepository.BookAppointment(slotId, patientId);
             }
 
-            public bool GenerateConsultationBill(int patientId, int appointmentId, decimal consultationFee)
+            public bool GenerateConsultationBill(int appointmentId)
             {
-                return _receptionistRepository.GenerateConsultationBill(patientId, appointmentId, consultationFee);
+                return _receptionistRepository.GenerateConsultationBill(appointmentId);
             }
 
-            public BillViewModel GetConsultationBillDetails(int patientId, int appointmentId)
+            public BillViewModel GetConsultationBillDetails(int appointmentId)
             {
-                return _receptionistRepository.GetConsultationBillDetails(patientId, appointmentId);
+                return _receptionistRepository.GetConsultationBillDetails(appointmentId);
             }
 
-        public List<SlotViewModel> GetAvailableSlots()
-        {
-            return _receptionistRepository.GetAvailableSlots();
-        }
+            public List<SlotViewModel> GetAvailableSlots()
+            {
+                return _receptionistRepository.GetAvailableSlots();
+            }
 
-        public List<SlotViewModel> GetAvailableDoctorSlots(DateTime slotDate)
-        {
-            return _receptionistRepository.GetAvailableDoctorSlots(slotDate);
+            public List<SlotViewModel> GetAvailableDoctorSlots(DateTime slotDate)
+            {
+                return _receptionistRepository.GetAvailableDoctorSlots(slotDate);
+            }
         }
-    }
     }

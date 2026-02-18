@@ -1,0 +1,97 @@
+﻿@{
+    ViewData["Title"] = "Generate Consultation Bill";
+}
+
+<div class="container mt-4">
+    <h2 class="text-center mb-4">Generate Consultation Bill</h2>
+
+    <!-- Alerts -->
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger text-center">@TempData["Error"]</div>
+    }
+    @if (TempData["Message"] != null)
+    {
+        <div class="alert alert-success text-center">@TempData["Message"]</div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger text-center">@TempData["ErrorMessage"]</div>
+    }
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success text-center">@TempData["SuccessMessage"]</div>
+    }
+
+    <div class="mb-3">
+        <a href="@Url.Action("TodayAppointments", "Receptionist")" class="btn btn-outline-secondary">
+            ← Back to Appointments
+        </a>
+    </div>
+
+    <!-- Bill generation form -->
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <h5 class="card-title mb-3">Generate Bill</h5>
+
+            <form asp-action="GenerateConsultationBill" asp-controller="Receptionist" method="post">
+                @Html.AntiForgeryToken()
+
+                <div class="mb-3">
+                    <label class="form-label">Appointment Id</label>
+                    <input type="number"
+                           name="appointmentId"
+                           class="form-control"
+                           required
+                           min="1"
+                           placeholder="Enter AppointmentId" />
+                </div>
+
+                <!-- These are only needed if your action method requires them -->
+                <div class="mb-3">
+                    <label class="form-label">Patient Id (if required)</label>
+                    <input type="number"
+                           name="patientId"
+                           class="form-control"
+                           min="1"
+                           placeholder="Enter PatientId (optional if not required)" />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Consultation Fee (if required)</label>
+                    <input type="number"
+                           name="consultationFee"
+                           class="form-control"
+                           step="0.01"
+                           min="0"
+                           placeholder="Optional (SP calculates fee from Doctor table)" />
+                    <small class="text-muted">
+                        Your stored procedure calculates fee from Doctor. This is only here if your controller expects it.
+                    </small>
+                </div>
+
+                <button type="submit" class="btn btn-success">
+                    Generate Bill
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Optional: show bill result if you pass it via ViewBag -->
+    @if (ViewBag.BillResult != null)
+    {
+        <div class="card mt-4">
+            <div class="card-header bg-dark text-white">
+                Bill Details
+            </div>
+            <div class="card-body">
+                <p><b>AppointmentId:</b> @ViewBag.BillResult.AppointmentId</p>
+                <p><b>Patient:</b> @ViewBag.BillResult.PatientName</p>
+                <p><b>Doctor:</b> @ViewBag.BillResult.DoctorName</p>
+                <p><b>Specialization:</b> @ViewBag.BillResult.Specialization</p>
+                <p><b>Date:</b> @ViewBag.BillResult.AppointmentDate</p>
+                <p><b>Consultation Bill:</b> ₹@ViewBag.BillResult.ConsultationBill</p>
+            </div>
+        </div>
+    }
+</div>

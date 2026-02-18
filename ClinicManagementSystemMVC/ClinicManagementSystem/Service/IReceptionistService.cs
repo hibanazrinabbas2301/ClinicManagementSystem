@@ -22,8 +22,8 @@ namespace ClinicManagementSystem_Final.Service
         int BookAppointment(int slotId, int patientId);
 
 
-        bool GenerateConsultationBill(int patientId, int appointmentId, decimal fee);
-        BillViewModel GetConsultationBillDetails(int patientId, int appointmentId);
+        bool GenerateConsultationBill(int appointmentId);
+        BillViewModel GetConsultationBillDetails(int appointmentId);
         List<SlotViewModel> GetAvailableSlots();
         List<SlotViewModel> GetAvailableDoctorSlots(DateTime slotDate);
 
