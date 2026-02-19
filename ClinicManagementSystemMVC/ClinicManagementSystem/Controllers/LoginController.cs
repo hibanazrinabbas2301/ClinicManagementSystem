@@ -59,7 +59,7 @@ namespace ClinicManagementSystem.Controllers
                 return RedirectToAction("Index", "Home");
 
             if (user.RoleName == "Lab Technician")
-                return RedirectToAction("LabTechDashBoard", "LabTechnicians");
+                return RedirectToAction("Index", "LabTechnicians");
 
             return RedirectToAction("Index");
         }

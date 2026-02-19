@@ -21,6 +21,8 @@ namespace ClinicManagementSystem.Repositories
                 FROM Staff s
                 INNER JOIN Roles r
                     ON s.RoleId = r.RoleId
+                    LEFT JOIN Doctor d
+                    ON d.StaffId = s.StaffId
                 WHERE s.Username = @Username
                   AND s.Password = @Password
                   AND s.Status = 'Active'

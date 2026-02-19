@@ -81,6 +81,16 @@ namespace ClinicManagementSystem.Services
         {
             _repo.MarkAppointmentCompleted(appointmentId);
         }
+        public List<MedicinePrescription> GetPatientMedicineHistory(int patientId)
+        {
+            return _repo.GetPatientMedicineHistory(patientId);
+        }
+
+        public List<LabPrescription> GetPatientLabHistory(int patientId)
+        {
+            return _repo.GetPatientLabHistory(patientId);
+        }
+
 
         // ===============================
         // Dashboard
