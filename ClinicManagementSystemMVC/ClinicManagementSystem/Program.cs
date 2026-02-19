@@ -59,7 +59,7 @@ namespace ClinicManagementSystem
 
             app.MapControllerRoute(
                 name: "default",
-                pattern: "{controller=LabTechnicians}/{action=LabTechDashBoard}/{id?}");
+                pattern: "{controller=LabTechnicians}/{action=Index}/{id?}");
 
             app.Run();
         }
