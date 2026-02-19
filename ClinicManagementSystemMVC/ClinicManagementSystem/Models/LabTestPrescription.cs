@@ -16,9 +16,11 @@
         public int Quantity { get; set; }
         public DateTime PrescribedDate { get; set; }
         public string Status { get; set; }
-
-        // ✅ ADD THIS
         public int? ResultId { get; set; }
+        public decimal? ActualValue { get; set; }
+        public string Remarks { get; set; }
+        public DateTime? ResultDate { get; set; }
+
     }
 
 }

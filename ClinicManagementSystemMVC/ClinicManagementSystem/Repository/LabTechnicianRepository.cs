@@ -295,6 +295,21 @@ namespace ClinicManagementSystem.Repositories
                         AppointmentId = Convert.ToInt32(reader["AppointmentId"]),
                         PatientId = Convert.ToInt32(reader["PatientId"]),
                         DoctorId = Convert.ToInt32(reader["DoctorId"]),
+
+                        ResultId = reader["ResultId"] != DBNull.Value
+                                    ? Convert.ToInt32(reader["ResultId"])
+                                    : (int?)null,
+
+                        ActualValue = reader["ActualValue"] != DBNull.Value
+                                    ? Convert.ToDecimal(reader["ActualValue"])
+                                    : (decimal?)null,
+
+                        Remarks = reader["Remarks"].ToString(),
+
+                        ResultDate = reader["ResultDate"] != DBNull.Value
+                 ? Convert.ToDateTime(reader["ResultDate"])
+                 : (DateTime?)null,
+
                         PatientName = reader["PatientName"].ToString(),
                         DoctorName = reader["DoctorName"].ToString(),
                         TestId = Convert.ToInt32(reader["TestId"]),

@@ -82,7 +82,7 @@ namespace ClinicManagementSystem.Controllers
                     new { appointmentId = model.AppointmentId, patientId = model.PatientId });
             }
 
-            model.DoctorId = Convert.ToInt32(HttpContext.Session.GetInt32("StaffId"));
+            model.DoctorId = Convert.ToInt32(HttpContext.Session.GetInt32("DoctorId"));
 
             _service.AddDiagnosis(model);
 
@@ -106,7 +106,7 @@ namespace ClinicManagementSystem.Controllers
             }
 
 
-            model.DoctorId = Convert.ToInt32(HttpContext.Session.GetInt32("StaffId"));
+            model.DoctorId = Convert.ToInt32(HttpContext.Session.GetInt32("DoctorId"));
 
             _service.AddMedicinePrescription(model);
 
@@ -129,7 +129,7 @@ namespace ClinicManagementSystem.Controllers
                     new { appointmentId = model.AppointmentId, patientId = model.PatientId });
             }
 
-            model.DoctorId = Convert.ToInt32(HttpContext.Session.GetInt32("StaffId"));
+            model.DoctorId = Convert.ToInt32(HttpContext.Session.GetInt32("DoctorId"));
             model.Quantity = 1;
 
 
