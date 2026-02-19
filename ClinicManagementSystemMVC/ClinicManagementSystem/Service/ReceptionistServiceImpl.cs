@@ -1,5 +1,6 @@
 ﻿
 using ClinicManagementSystem.Models;
+using ClinicManagementSystem.Service;
 using ClinicManagementSystem_Final.Repository;
 
 namespace ClinicManagementSystem.Services
@@ -7,14 +8,18 @@ namespace ClinicManagementSystem.Services
     public class ReceptionistServiceImpl : IReceptionistService
         {
             private readonly IReceptionistRepository _receptionistRepository;
+            private readonly IEmailService _emailService;
 
-            public ReceptionistServiceImpl(IReceptionistRepository receptionistRepository)
-            {
-                _receptionistRepository = receptionistRepository;
-            }
+        public ReceptionistServiceImpl(
+                                        IReceptionistRepository receptionistRepository,
+                                        IEmailService emailService)
+        {
+            _receptionistRepository = receptionistRepository;
+            _emailService = emailService;
+        }
 
-            // ---------------------- Patient Management ----------------------
-            public void AddPatient(Patient patient)
+        // ---------------------- Patient Management ----------------------
+        public void AddPatient(Patient patient)
             {
                 _receptionistRepository.AddPatient(patient);
             }
@@ -89,5 +94,15 @@ namespace ClinicManagementSystem.Services
             {
                 return _receptionistRepository.GetAvailableDoctorSlots(slotDate);
             }
-        }
+            public void SendConsultationBillEmail(int appointmentId, string email)
+            {
+                var bill = _receptionistRepository.GetConsultationBillDetails(appointmentId);
+
+                if (bill == null)
+                    throw new Exception("Bill not found.");
+
+                _emailService.SendBill(email, bill);
+            }
+    
     }
+}

@@ -26,6 +26,8 @@ namespace ClinicManagementSystem.Services
         BillViewModel GetConsultationBillDetails(int appointmentId);
         List<SlotViewModel> GetAvailableSlots();
         List<SlotViewModel> GetAvailableDoctorSlots(DateTime slotDate);
+        void SendConsultationBillEmail(int appointmentId, string email);
+
 
     }
 }

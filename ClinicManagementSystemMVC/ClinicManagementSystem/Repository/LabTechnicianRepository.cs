@@ -1,4 +1,4 @@
-﻿using ClassLibraryDataBaseConnection;
+﻿using ClassLibrary1;
 using ClinicManagementSystem.Models;
 using Microsoft.Data.SqlClient;
 using System.Data;
