@@ -39,6 +39,7 @@ namespace ClinicManagementSystem.Repositories
                     }
                 }
             }
+
             return list;
         }
         #endregion
@@ -73,19 +74,20 @@ namespace ClinicManagementSystem.Repositories
                 SqlCommand cmd = new SqlCommand("SELECT * FROM LabTest WHERE TestId=@TestId", connection);
                 cmd.Parameters.AddWithValue("@TestId", testId);
 
-                SqlDataReader reader = cmd.ExecuteReader();
-                if (reader.Read())
+                using (SqlDataReader reader = cmd.ExecuteReader())
                 {
-                    labTest = new LabTest
+                    if (reader.Read())
                     {
-                        TestId = Convert.ToInt32(reader["TestId"]),
-                        TestName = reader["TestName"].ToString(),
-                        Price = Convert.ToDecimal(reader["Price"]),
-                        SampleType = reader["SampleType"].ToString(),
-                        NormalRange = reader["NormalRange"].ToString()
-                    };
+                        labTest = new LabTest
+                        {
+                            TestId = Convert.ToInt32(reader["TestId"]),
+                            TestName = reader["TestName"].ToString(),
+                            Price = Convert.ToDecimal(reader["Price"]),
+                            SampleType = reader["SampleType"].ToString(),
+                            NormalRange = reader["NormalRange"].ToString()
+                        };
+                    }
                 }
-                reader.Close();
             }
 
             return labTest;
@@ -123,28 +125,38 @@ namespace ClinicManagementSystem.Repositories
                 SqlCommand cmd = new SqlCommand("sp_LabTech_PendingTests", connection);
                 cmd.CommandType = CommandType.StoredProcedure;
 
-                SqlDataReader reader = cmd.ExecuteReader();
-                while (reader.Read())
+                using (SqlDataReader reader = cmd.ExecuteReader())
                 {
-                    list.Add(new LabTestPrescription
+                    while (reader.Read())
                     {
-                        PrescriptionId = Convert.ToInt32(reader["PrescriptionId"]),
-                        AppointmentId = Convert.ToInt32(reader["AppointmentId"]),
-                        TestName = reader["TestName"].ToString(),
-                        Quantity = Convert.ToInt32(reader["Quantity"]),
-                        Status = reader["Status"].ToString(),
-                        PrescribedDate = Convert.ToDateTime(reader["PrescribedDate"])
-                    });
+                        list.Add(new LabTestPrescription
+                        {
+                            PrescriptionId = Convert.ToInt32(reader["PrescriptionId"]),
+                            AppointmentId = Convert.ToInt32(reader["AppointmentId"]),
+                            PatientId = Convert.ToInt32(reader["PatientId"]),
+                            PatientName = reader["PatientName"].ToString(),
+                            DoctorId = Convert.ToInt32(reader["DoctorId"]),
+                            DoctorName = reader["DoctorName"].ToString(),
+                            TestId = Convert.ToInt32(reader["TestId"]),
+                            TestName = reader["TestName"].ToString(),
+                            SampleType = reader["SampleType"].ToString(),
+                            Price = Convert.ToDecimal(reader["Price"]),
+                            NormalRange = reader["NormalRange"].ToString(),
+                            Quantity = Convert.ToInt32(reader["Quantity"]),
+                            Status = reader["Status"].ToString(),
+                            PrescribedDate = Convert.ToDateTime(reader["PrescribedDate"])
+                        });
+                    }
                 }
-                reader.Close();
             }
+
             return list;
         }
         #endregion
 
 
         #region Add Lab Result
-        public void AddLabResult(LabResult result)
+        public int AddLabResult(LabResult result)
         {
             using (SqlConnection connection = ConnectionManager.OpenConnection(connectionString))
             {
@@ -153,12 +165,11 @@ namespace ClinicManagementSystem.Repositories
 
                 cmd.Parameters.AddWithValue("@TestId", result.TestId);
                 cmd.Parameters.AddWithValue("@PatientId", result.PatientId);
-                cmd.Parameters.AddWithValue("@LowRange", result.LowRange);
-                cmd.Parameters.AddWithValue("@HighRange", result.HighRange);
+                cmd.Parameters.AddWithValue("@NormalRange", result.NormalRange);
                 cmd.Parameters.AddWithValue("@ActualValue", result.ActualValue);
                 cmd.Parameters.AddWithValue("@Remarks", result.Remarks);
 
-                cmd.ExecuteNonQuery();
+                return Convert.ToInt32(cmd.ExecuteScalar());
             }
         }
         #endregion
@@ -198,6 +209,40 @@ namespace ClinicManagementSystem.Repositories
         #endregion
 
 
+        #region Get Result By Id (For PDF + Email)
+        public LabResult GetResultById(int resultId)
+        {
+            LabResult result = null;
+
+            using (SqlConnection connection = ConnectionManager.OpenConnection(connectionString))
+            {
+                SqlCommand cmd = new SqlCommand("SELECT * FROM LabResult WHERE ResultId=@ResultId", connection);
+                cmd.Parameters.AddWithValue("@ResultId", resultId);
+
+                using (SqlDataReader reader = cmd.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        result = new LabResult
+                        {
+                            ResultId = Convert.ToInt32(reader["ResultId"]),
+                            TestId = Convert.ToInt32(reader["TestId"]),
+                            PatientId = Convert.ToInt32(reader["PatientId"]),
+                            NormalRange = reader["NormalRange"].ToString(),
+                            ActualValue = Convert.ToDecimal(reader["ActualValue"]),
+                            Remarks = reader["Remarks"].ToString(),
+                            DoctorReview = reader["DoctorReview"].ToString(),
+                            Date = Convert.ToDateTime(reader["Date"])
+                        };
+                    }
+                }
+            }
+
+            return result;
+        }
+        #endregion
+
+
         #region View Patient Lab Reports
         public IEnumerable<LabResult> GetPatientLabReports(int patientId)
         {
@@ -209,22 +254,67 @@ namespace ClinicManagementSystem.Repositories
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.AddWithValue("@PatientId", patientId);
 
-                SqlDataReader reader = cmd.ExecuteReader();
-                while (reader.Read())
+                using (SqlDataReader reader = cmd.ExecuteReader())
                 {
-                    list.Add(new LabResult
+                    while (reader.Read())
                     {
-                        ResultId = Convert.ToInt32(reader["ResultId"]),
-                        ActualValue = Convert.ToDecimal(reader["ActualValue"]),
-                        Remarks = reader["Remarks"].ToString(),
-                        DoctorReview = reader["DoctorReview"].ToString(),
-                        Date = Convert.ToDateTime(reader["Date"])
-                    });
+                        list.Add(new LabResult
+                        {
+                            ResultId = Convert.ToInt32(reader["ResultId"]),
+                            ActualValue = Convert.ToDecimal(reader["ActualValue"]),
+                            Remarks = reader["Remarks"].ToString(),
+                            DoctorReview = reader["DoctorReview"].ToString(),
+                            Date = Convert.ToDateTime(reader["Date"])
+                        });
+                    }
                 }
-                reader.Close();
             }
+
             return list;
         }
         #endregion
+
+
+        #region View Completed Tests
+        public IEnumerable<LabTestPrescription> GetCompletedTests()
+        {
+            List<LabTestPrescription> list = new List<LabTestPrescription>();
+
+            using (SqlConnection connection = ConnectionManager.OpenConnection(connectionString))
+            {
+                SqlCommand cmd = new SqlCommand("sp_LabTech_CompletedTests", connection);
+                cmd.CommandType = CommandType.StoredProcedure;
+
+                SqlDataReader reader = cmd.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    list.Add(new LabTestPrescription
+                    {
+                        PrescriptionId = Convert.ToInt32(reader["PrescriptionId"]),
+                        AppointmentId = Convert.ToInt32(reader["AppointmentId"]),
+                        PatientId = Convert.ToInt32(reader["PatientId"]),
+                        DoctorId = Convert.ToInt32(reader["DoctorId"]),
+                        PatientName = reader["PatientName"].ToString(),
+                        DoctorName = reader["DoctorName"].ToString(),
+                        TestId = Convert.ToInt32(reader["TestId"]),
+                        TestName = reader["TestName"].ToString(),
+                        SampleType = reader["SampleType"].ToString(),
+                        NormalRange = reader["NormalRange"].ToString(),
+                        Price = Convert.ToDecimal(reader["Price"]),
+                        Quantity = Convert.ToInt32(reader["Quantity"]),
+                        Status = reader["Status"].ToString(),
+                        PrescribedDate = Convert.ToDateTime(reader["PrescribedDate"])
+                    });
+                }
+
+                reader.Close();
+            }
+
+            return list;
+        }
+
+        #endregion
+
     }
 }

@@ -5,5 +5,7 @@
         public int StaffId { get; set; }
         public string Name { get; set; }
         public string RoleName { get; set; }
+        public int? DoctorId { get; set; }
+
     }
 }

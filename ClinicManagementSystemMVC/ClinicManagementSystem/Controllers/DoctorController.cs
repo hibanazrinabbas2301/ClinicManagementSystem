@@ -22,7 +22,7 @@ namespace ClinicManagementSystem.Controllers
         public IActionResult Index()
         {
 
-            int doctorId = Convert.ToInt32(HttpContext.Session.GetInt32("StaffId"));
+            int doctorId = Convert.ToInt32(HttpContext.Session.GetInt32("DoctorId"));
 
             var appointments = _service.GetTodaysAppointments(doctorId);
 
@@ -45,6 +45,12 @@ namespace ClinicManagementSystem.Controllers
             // Patient History
             ViewBag.History = _service.GetPatientHistory(patientId);
             ViewBag.PatientInfo = _service.GetPatientBasicDetails(patientId);
+            // ✅ Patient Diagnosis History
+            ViewBag.History = _service.GetPatientHistory(patientId);
+
+            // ✅ NEW: Medicine + Lab History
+            ViewBag.MedicineHistory = _service.GetPatientMedicineHistory(patientId);
+            ViewBag.LabHistory = _service.GetPatientLabHistory(patientId);
 
 
             // ✅ Load Existing Diagnosis (if already saved)
@@ -92,12 +98,13 @@ namespace ClinicManagementSystem.Controllers
         [HttpPost]
         public IActionResult AddMedicinePrescription(MedicinePrescription model)
         {
-            if (model.MedicineId == 0 || model.Quantity <= 0)
+            if (model.MedicineId == 0 || model.Quantity <= 0 || string.IsNullOrEmpty(model.Dosage))
             {
-                TempData["Error"] = "⚠ Please select medicine and enter quantity!";
+                TempData["Error"] = "⚠ Please select medicine, quantity and dosage!";
                 return RedirectToAction("Consultation",
                     new { appointmentId = model.AppointmentId, patientId = model.PatientId });
             }
+
 
             model.DoctorId = Convert.ToInt32(HttpContext.Session.GetInt32("StaffId"));
 
@@ -115,9 +122,9 @@ namespace ClinicManagementSystem.Controllers
         [HttpPost]
         public IActionResult AddLabPrescription(LabPrescription model)
         {
-            if (model.TestId == 0 || model.Quantity <= 0)
+            if (model.TestId == null || model.TestId == 0)
             {
-                TempData["Error"] = "⚠ Please select lab test before adding!";
+                // No error, just return back
                 return RedirectToAction("Consultation",
                     new { appointmentId = model.AppointmentId, patientId = model.PatientId });
             }

@@ -37,6 +37,10 @@ namespace ClinicManagementSystem.Services
         // ===============================
         List<Diagnosis> GetPatientHistory(int patientId);
         PatientBasicInfo GetPatientBasicDetails(int patientId);
+        List<MedicinePrescription> GetPatientMedicineHistory(int patientId);
+
+        List<LabPrescription> GetPatientLabHistory(int patientId);
+
 
 
         // ===============================

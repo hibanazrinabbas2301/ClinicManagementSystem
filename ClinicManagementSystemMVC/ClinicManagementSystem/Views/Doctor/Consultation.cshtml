@@ -159,6 +159,12 @@
                         <label class="fw-semibold">Quantity</label>
                         <input type="number" name="Quantity" class="form-control" min="1" required />
                     </div>
+                    <div class="mb-3">
+                        <label class="fw-semibold">Dosage</label>
+                        <input type="text" name="Dosage"
+                               class="form-control"
+                               placeholder="Eg: 500mg / 10ml" required />
+                    </div>
 
                     <div class="mb-3">
                         <label class="fw-semibold">Frequency</label>
@@ -190,6 +196,7 @@
                             <tr>
                                 <th>Medicine</th>
                                 <th>Qty</th>
+                                <th>Dosage</th>
                                 <th>Frequency</th>
                                 <th>Days</th>
                             </tr>
@@ -200,6 +207,7 @@
                                 <tr>
                                     <td>@m.MedicineName</td>
                                     <td>@m.Quantity</td>
+                                    <td>@m.Dosage</td>
                                     <td>@m.Frequency</td>
                                     <td>@m.DurationDays</td>
                                 </tr>
@@ -228,7 +236,7 @@
                     <input type="hidden" name="AppointmentId" value="@Model.AppointmentId" />
                     <input type="hidden" name="PatientId" value="@Model.PatientId" />
 
-                    <label class="fw-semibold">Select Lab Test (Optional)</label>
+                    <label><b>Select Lab Test (Optional)</b></label>
                     <select name="TestId" class="form-select">
                         <option value="">-- Select Test (If Needed) --</option>
                         @foreach (var t in ViewBag.LabTests)
@@ -318,6 +326,102 @@
 
     </div>
 </div>
+<div class="card shadow-sm border-0 rounded-4 mb-4">
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0">💊 Medicine History</h5>
+    </div>
+
+    <div class="card-body">
+        @if (ViewBag.MedicineHistory.Count == 0)
+        {
+            <p class="text-muted">No previous medicines prescribed.</p>
+        }
+        else
+        {
+            <table class="table table-sm table-hover">
+                <thead>
+                    <tr>
+                        <th>Medicine</th>
+                        <th>Dosage</th>
+                        <th>Qty</th>
+                        <th>Frequency</th>
+                        <th>Days</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var med in ViewBag.MedicineHistory)
+                    {
+                        <tr>
+                            <td>@med.MedicineName</td>
+                            <td>@med.Dosage</td>
+                            <td>@med.Quantity</td>
+                            <td>@med.Frequency</td>
+                            <td>@med.DurationDays</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+</div>
+<div class="card shadow-sm border-0 rounded-4 mb-4">
+    <div class="card-header bg-danger text-white">
+        <h5 class="mb-0">🧪 Lab Test Results</h5>
+    </div>
+
+    <div class="card-body">
+        @if (ViewBag.LabHistory.Count == 0)
+        {
+            <p class="text-muted">No lab tests prescribed yet.</p>
+        }
+        else
+        {
+            <table class="table table-sm table-hover">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Test</th>
+                        <th>Status</th>
+                        <th>Result</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var lab in ViewBag.LabHistory)
+                    {
+                        <tr>
+                            <td>@lab.PrescribedDate.ToShortDateString()</td>
+                            <td>@lab.TestName</td>
+
+                            <td>
+                                <span class="badge bg-info">@lab.Status</span>
+                            </td>
+
+                            <td>
+                                @if (lab.ResultText == null)
+                                {
+                                    <span class="text-muted">Pending</span>
+                                }
+                                else
+                                {
+                                    <span class="text-success fw-bold">
+                                        @lab.ResultText
+                                    </span>
+
+                                    <br />
+                                    <small class="text-muted">
+                                        Updated: @lab.ResultDate?.ToShortDateString()
+                                    </small>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+</div>
+
+
 
 <!-- ============================= -->
 <!-- ✅ Finish Consultation -->

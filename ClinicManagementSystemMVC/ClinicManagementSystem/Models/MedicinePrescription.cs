@@ -11,6 +11,8 @@
 
         public string Frequency { get; set; }
 
+        public string Dosage { get; set; }
+
         public int DurationDays { get; set; }
         public string MedicineName { get; set; }
         public string PatientName { get; set; }

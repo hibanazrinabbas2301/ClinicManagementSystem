@@ -9,6 +9,10 @@
         public int TestId { get; set; }
         public int Quantity { get; set; }
         public string TestName { get; set; }
+        public DateTime PrescribedDate { get; set; }
+        public string? ResultText { get; set; }
+        public DateTime? ResultDate { get; set; }
+
 
         // ✅ Extra Display Property (Pending / Completed)
         public string Status { get; set; }
