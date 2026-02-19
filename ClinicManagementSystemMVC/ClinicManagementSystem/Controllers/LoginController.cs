@@ -43,6 +43,10 @@ namespace ClinicManagementSystem.Controllers
             HttpContext.Session.SetInt32("StaffId", user.StaffId);
             HttpContext.Session.SetString("RoleName", user.RoleName);
             HttpContext.Session.SetString("UserName", user.Name);
+            if (user.RoleName == "Doctor" && user.DoctorId != null)
+            {
+                HttpContext.Session.SetInt32("DoctorId", user.DoctorId.Value);
+            }
 
             // ✅ Step 4: Redirect Role Dashboard
             if (user.RoleName == "Receptionist")

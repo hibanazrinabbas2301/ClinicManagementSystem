@@ -22,7 +22,7 @@ namespace ClinicManagementSystem.Controllers
         public IActionResult Index()
         {
 
-            int doctorId = Convert.ToInt32(HttpContext.Session.GetInt32("StaffId"));
+            int doctorId = Convert.ToInt32(HttpContext.Session.GetInt32("DoctorId"));
 
             var appointments = _service.GetTodaysAppointments(doctorId);
 

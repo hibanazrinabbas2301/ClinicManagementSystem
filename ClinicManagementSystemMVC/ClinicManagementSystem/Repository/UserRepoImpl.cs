@@ -17,7 +17,7 @@ namespace ClinicManagementSystem.Repositories
             using (SqlConnection con = new SqlConnection(_ConnectionString))
             {
                 var query = @"
-                SELECT s.StaffId, s.Name, r.RoleName
+                SELECT s.StaffId, s.Name, r.RoleName,d.DoctorId
                 FROM Staff s
                 INNER JOIN Roles r
                     ON s.RoleId = r.RoleId
@@ -40,7 +40,12 @@ namespace ClinicManagementSystem.Repositories
                     {
                         StaffId = Convert.ToInt32(reader["StaffId"]),
                         Name = reader["Name"].ToString(),
-                        RoleName = reader["RoleName"].ToString()
+                        RoleName = reader["RoleName"].ToString(),
+                        DoctorId = reader["DoctorId"] == DBNull.Value
+                        ? null : Convert.ToInt32(reader["DoctorId"])
+
+
+
                     };
                 }
             }

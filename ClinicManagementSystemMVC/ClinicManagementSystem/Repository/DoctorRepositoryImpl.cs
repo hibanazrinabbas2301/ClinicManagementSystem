@@ -242,6 +242,7 @@ namespace ClinicManagementSystem.Repositories
                 {
                     AppointmentId = Convert.ToInt32(dr["AppointmentId"]),
                     PatientId = Convert.ToInt32(dr["PatientId"]),
+                    TokenNumber = Convert.ToInt32(dr["TokenNumber"]), // ✅ FIXEd
                     PatientName = dr["PatientName"].ToString(),
                     StartTime = dr["StartTime"].ToString(),
                     EndTime = dr["EndTime"].ToString(),
