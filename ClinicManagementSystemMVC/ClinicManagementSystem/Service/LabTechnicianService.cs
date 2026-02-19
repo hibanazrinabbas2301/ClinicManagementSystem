@@ -7,7 +7,6 @@ namespace ClinicManagementSystem.Services
     {
         private readonly ILabTechnicianRepository _labTechnicianRepository;
 
-        // DI
         public LabTechnicianService(ILabTechnicianRepository labTechnicianRepository)
         {
             _labTechnicianRepository = labTechnicianRepository;
@@ -50,14 +49,19 @@ namespace ClinicManagementSystem.Services
 
         #region Lab Result
 
-        public void InsertLabResult(LabResult result)
+        public int InsertLabResult(LabResult result)
         {
-            _labTechnicianRepository.AddLabResult(result);
+            return _labTechnicianRepository.AddLabResult(result);
         }
 
         public void UpdateLabTestStatus(int prescriptionId, string status)
         {
             _labTechnicianRepository.UpdateLabTestStatus(prescriptionId, status);
+        }
+
+        public LabResult GetResultById(int resultId)
+        {
+            return _labTechnicianRepository.GetResultById(resultId);
         }
 
         #endregion
@@ -78,6 +82,15 @@ namespace ClinicManagementSystem.Services
         public IEnumerable<LabResult> SelectPatientLabReports(int patientId)
         {
             return _labTechnicianRepository.GetPatientLabReports(patientId);
+        }
+
+        #endregion
+
+
+        #region Completed Tests
+        public IEnumerable<LabTestPrescription> SelectCompletedTests()
+        {
+            return _labTechnicianRepository.GetCompletedTests();
         }
 
         #endregion
