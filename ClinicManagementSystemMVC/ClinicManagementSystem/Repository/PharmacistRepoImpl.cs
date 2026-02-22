@@ -44,6 +44,7 @@ namespace ClinicManagementSystem.Repositories
                             medicine.MedicineName = reader["MedicineName"].ToString();
                             medicine.MedicineDescription = reader["MedicineDescription"].ToString();
                             medicine.CategoryName = reader["CategoryName"].ToString();
+                            medicine.CategoryId = Convert.ToInt32(reader["CategoryId"]); // needs SP fix
                             medicine.CurrentStock = Convert.ToInt32(reader["CurrentStock"].ToString());
                             medicine.ExpiryDate = Convert.ToDateTime(reader["ExpiryDate"].ToString());
                             medicine.Price = Convert.ToDecimal(reader["Price"].ToString());

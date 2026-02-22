@@ -2,7 +2,7 @@
 
 namespace ClinicManagementSystem.ViewModel
 {
-    public class AddMedicineViewModel
+    public class AddMedicineViewModel :IValidatableObject
     {
         [Required(ErrorMessage = "Medicine name is required")]
         [StringLength(100, ErrorMessage = "Name cannot exceed 100 characters")]
@@ -22,6 +22,15 @@ namespace ClinicManagementSystem.ViewModel
         [Required(ErrorMessage = "Expiry date is required")]
         [DataType(DataType.Date)]
         public DateTime ExpiryDate { get; set; }
+        public IEnumerable<ValidationResult> Validate(ValidationContext context)
+        {
+            if (ExpiryDate.Date < DateTime.Today)
+            {
+                yield return new ValidationResult(
+                    "Expiry date cannot be in the past",
+                    new[] { nameof(ExpiryDate) });
+            }
+        }
 
         // ✅ Price cannot be negative or zero
         [Required(ErrorMessage = "Price is required")]
