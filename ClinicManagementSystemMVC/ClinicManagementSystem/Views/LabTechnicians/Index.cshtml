@@ -6,34 +6,56 @@
     var completed = ViewBag.CompletedTests as List<ClinicManagementSystem.Models.LabTestPrescription>;
 }
 
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <div class="container-fluid py-4">
 
     <!-- HEADER -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="fw-bold text-primary">Lab Technician DashBoard</h2>
-        <a href="@Url.Action("Logout", "Account")" class="btn btn-danger">Logout</a>
+    <div class="page-header mb-4">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+
+            <div>
+                <h2 class="fw-bold mb-1">Lab Technician Dashboard</h2>
+                <p class="text-muted mb-0">
+                    Manage lab tests and generate reports
+                </p>
+            </div>
+
+            @* <a asp-controller="LabTechnicians"
+               asp-action="Index"
+               class="btn btn-primary">
+                <i class="bi bi-arrow-left"></i> Back to Dashboard
+            </a> *@
+
+        </div>
     </div>
 
     <!-- DASHBOARD CARDS -->
     <div class="row mb-4 text-center">
+
         <div class="col-md-6">
-            <div class="card shadow border-0 p-4 dashboard-card bg-warning text-white"
+            <div class="dashboard-card h-100"
                  onclick="showSection('pendingSection')">
-                <h5>Pending Tests</h5>
-                <h1>@(pending?.Count ?? 0)</h1>
+
+                <h6 class="text-muted">Pending Tests</h6>
+                <h2 class="fw-bold text-primary">
+                    @(pending?.Count ?? 0)
+                </h2>
             </div>
         </div>
+
         <div class="col-md-6">
-            <div class="card shadow border-0 p-4 dashboard-card bg-success text-white"
+            <div class="dashboard-card h-100"
                  onclick="showSection('completedSection')">
-                <h5>Completed Tests</h5>
-                <h1>@(completed?.Count ?? 0)</h1>
+
+                <h6 class="text-muted">Completed Tests</h6>
+                <h2 class="fw-bold text-primary">
+                    @(completed?.Count ?? 0)
+                </h2>
             </div>
         </div>
+
     </div>
 
     <!-- ================== PENDING SECTION ================== -->
@@ -50,7 +72,7 @@
 
         <div class="table-responsive">
             <table class="table table-bordered table-hover align-middle">
-                <thead class="table-warning text-center">
+                <thead class="text-center">
                     <tr>
                         <th>Prescription No</th>
                         <th>Patient</th>
@@ -81,7 +103,7 @@
                                 </td>
 
                                 <td class="text-center">
-                                    <button class="btn btn-warning btn-sm openResultModal"
+                                    <button class="btn btn-primary btn-sm openResultModal"
                                             data-prescription="@p.PrescriptionId"
                                             data-test="@p.TestId"
                                             data-patient="@p.PatientId"
@@ -123,7 +145,7 @@
         <div class="table-responsive">
             <table class="table table-bordered table-hover align-middle">
 
-                <thead class="table-success text-center">
+                <thead class="text-center">
                     <tr>
                         <th>Prescription No</th>
                         <th>Patient</th>
@@ -173,7 +195,7 @@
                                 </td>
 
                                 <td class="text-center">
-                                    <button class="btn btn-secondary btn-sm"
+                                    <button class="btn btn-primary btn-sm"
                                             onclick="openPrintPreview(@c.ResultId)">
                                         <i class="fas fa-print"></i> Print
                                     </button>
@@ -395,16 +417,7 @@
 
 
 
-<style>
-    .dashboard-card {
-        cursor: pointer;
-        transition: 0.3s;
-    }
 
-        .dashboard-card:hover {
-            transform: scale(1.05);
-        }
-</style>
 
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>

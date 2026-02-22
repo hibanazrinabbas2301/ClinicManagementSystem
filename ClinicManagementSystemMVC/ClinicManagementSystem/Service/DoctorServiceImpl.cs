@@ -47,7 +47,9 @@ namespace ClinicManagementSystem.Services
             // 3️⃣ Check Stock
             if (availableStock < requiredQuantity)
             {
-                throw new Exception("Not enough stock available for this medicine.");
+                throw new Exception(
+                    $"Only {availableStock} units available in stock."
+                );
             }
 
             // 4️⃣ Convert ViewModel → Entity Model

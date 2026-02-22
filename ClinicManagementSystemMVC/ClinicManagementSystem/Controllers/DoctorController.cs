@@ -122,18 +122,38 @@ namespace ClinicManagementSystem.Controllers
                 return RedirectToAction("Index");
             }
 
-            var model = new PrescriptionDetailViewModel
-            {
-                AppointmentId = AppointmentId,
-                PatientId = PatientId,
-                DoctorId = Convert.ToInt32(HttpContext.Session.GetInt32("DoctorId")),
-                MedicineId = MedicineId,
-                Dosage = Dosage,
-                Frequency = Frequency,
-                DurationDays = DurationDays
-            };
+            //var model = new PrescriptionDetailViewModel
+            //{
+            //    AppointmentId = AppointmentId,
+            //    PatientId = PatientId,
+            //    DoctorId = Convert.ToInt32(HttpContext.Session.GetInt32("DoctorId")),
+            //    MedicineId = MedicineId,
+            //    Dosage = Dosage,
+            //    Frequency = Frequency,
+            //    DurationDays = DurationDays
+            //};
 
-            _service.AddMedicinePrescription(model);
+            try
+            {
+                var model = new PrescriptionDetailViewModel
+                {
+                    AppointmentId = AppointmentId,
+                    PatientId = PatientId,
+                    DoctorId = Convert.ToInt32(HttpContext.Session.GetInt32("DoctorId")),
+                    MedicineId = MedicineId,
+                    Dosage = Dosage,
+                    Frequency = Frequency,
+                    DurationDays = DurationDays
+                };
+
+                _service.AddMedicinePrescription(model);
+
+                TempData["Success"] = "Medicine added successfully.";
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = ex.Message;   // 👈 THIS SHOWS ALERT
+            }
 
             return RedirectToAction("Consultation",
                 new { appointmentId = AppointmentId, patientId = PatientId });

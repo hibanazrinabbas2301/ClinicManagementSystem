@@ -4,80 +4,112 @@
     ViewData["Title"] = "Pending Prescriptions";
 }
 
-<div class="container mt-4">
+<!-- ================= PAGE HEADER ================= -->
+<div class="page-header mb-4">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>Pending Prescriptions</h2>
-        <a href="/Prescription/IssuedBills" class="btn btn-success">
-            <i class="bi bi-receipt"></i> View Bills
-        </a>
+        <div>
+            <h2 class="fw-bold mb-1">Pending Prescriptions</h2>
+            <p class="text-muted mb-0">
+                Review and issue prescribed medicines
+            </p>
+        </div>
+
+        <div class="d-flex gap-2">
+
+            <!-- Back to Dashboard -->
+            <a asp-controller="Home"
+               asp-action="Index"
+               class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Back to Dashboard
+            </a>
+
+            <!-- View Bills -->
+            <a href="/Prescription/IssuedBills" class="btn btn-primary">
+                <i class="bi bi-receipt"></i> View Bills
+            </a>
+
+        </div>
+
     </div>
-
-    <table class="table table-bordered table-hover">
-        <thead class="table-dark">
-            <tr>
-                <th>Appointment Id</th>
-                <th>Patient</th>
-                <th>Date</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-
-        <tbody>
-            @if (Model != null && Model.Any())
-            {
-                foreach (var item in Model)
-                {
-                    <tr>
-                        <td>@item.AppointmentId</td>
-                        <td>@item.PatientName</td>
-                        <td>@item.PrescribedDate.ToString("dd-MM-yyyy")</td>
-                        <td>
-                            <button class="btn btn-primary btn-sm viewBtn"
-                                    data-id="@item.AppointmentId">
-                                <i class="bi bi-eye"></i> View
-                            </button>
-                        </td>
-                    </tr>
-                }
-            }
-            else
-            {
-                <tr>
-                    <td colspan="4" class="text-center text-muted">
-                        No Pending Prescriptions
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
-
 </div>
 
-<!-- Prescription Modal -->
+<!-- ================= TABLE CARD ================= -->
+<div class="dashboard-card">
+
+    @if (Model != null && Model.Any())
+    {
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+
+                <thead>
+                    <tr>
+                        <th>Appointment Id</th>
+                        <th>Patient</th>
+                        <th>Date</th>
+                        <th width="120">Action</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td class="fw-semibold">@item.AppointmentId</td>
+                            <td>@item.PatientName</td>
+                            <td>@item.PrescribedDate.ToString("dd-MM-yyyy")</td>
+                            <td>
+                                <button class="btn btn-sm btn-primary viewBtn"
+                                        data-id="@item.AppointmentId">
+                                    <i class="bi bi-eye"></i> View
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <div class="text-center text-muted py-5">
+            <i class="bi bi-clipboard-x fs-1 d-block mb-2"></i>
+            No Pending Prescriptions
+        </div>
+    }
+
+</div>
+<!-- ================= PRESCRIPTION MODAL ================= -->
 <div class="modal fade" id="prescriptionModal" tabindex="-1">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
 
             <div class="modal-header">
-                <h5 class="modal-title">Prescription Details</h5>
+                <h5 class="fw-bold mb-0">Prescription Details</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
 
             <div class="modal-body">
-                <table class="table table-bordered">
-                    <thead>
-                        <tr>
-                            <th>Medicine</th>
-                            <th>Quantity</th>
-                            <th>Frequency</th>
-                            <th>Duration</th>
-                            <th>Issue</th>
-                        </tr>
-                    </thead>
-                    <tbody id="prescriptionDetailsBody">
-                    </tbody>
-                </table>
+
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+
+                        <thead>
+                            <tr>
+                                <th>Medicine</th>
+                                <th>Quantity</th>
+                                <th>Frequency</th>
+                                <th>Duration</th>
+                                <th width="100">Issue</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="prescriptionDetailsBody">
+                        </tbody>
+
+                    </table>
+                </div>
+
             </div>
 
         </div>
@@ -140,8 +172,8 @@
                     success: function (response) {
 
                         if (response.success) {
-                            alert("✅ Medicine Issued Successfully!");
-                            location.reload();
+        showSuccess("Medicine issued successfully!");                            
+        location.reload();
                         }
                         else {
                             alert(response.message);

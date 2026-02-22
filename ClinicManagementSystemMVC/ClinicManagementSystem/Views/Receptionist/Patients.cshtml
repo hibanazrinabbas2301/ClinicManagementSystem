@@ -7,204 +7,120 @@
     var genderList = new List<string> { "Male", "Female", "Other" };
 }
 
-<div class="mb-3">
-    <a href="@Url.Action("Index", "Receptionist")" class="btn btn-outline-secondary">
-        <i class="bi bi-arrow-left"></i> Dashboard
-    </a>
-</div>
+<!-- ================= HEADER SECTION ================= -->
+<div class="page-header mb-4">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
 
-<h2 class="mb-4 text-center">Patients List</h2>
+        <div>
+            <h2 class="fw-bold mb-1">Patients</h2>
+            <p class="text-muted mb-0">Search, manage and update patient records.</p>
+        </div>
+
+        <a href="@Url.Action("Index", "Receptionist")"
+           class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Back to Dashboard
+        </a>
+    </div>
+</div>
 
 @if (TempData["PatientUpdateSuccess"] != null)
 {
-    <div class="alert alert-success text-center">
+    <div class="alert alert-success shadow-sm">
         @TempData["PatientUpdateSuccess"]
     </div>
 }
 
-<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
-    <!-- Search form -->
-    <form method="get" asp-action="Patients" asp-controller="Receptionist" class="d-flex gap-2 flex-wrap">
-        <input type="text" name="mmrNo" class="form-control" placeholder="Search by MMR No" value="@mmrNo" />
-        <input type="text" name="phone" class="form-control" placeholder="Search by Phone" value="@phone" />
-        <button type="submit" class="btn btn-primary">Search</button>
-    </form>
+<!-- ================= SEARCH + ACTION BAR ================= -->
+<div class="card shadow-sm mb-4">
+    <div class="card-body d-flex justify-content-between align-items-center flex-wrap gap-3">
 
-    <!-- Add Patient Button -->
-    <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addPatientModal">
-        <i class="bi bi-person-plus"></i> Add New Patient
-    </button>
-</div>
+        <!-- Search Form -->
+        <form method="get"
+              asp-action="Patients"
+              asp-controller="Receptionist"
+              class="d-flex gap-2 flex-wrap">
 
-<!-- ===================== ADD PATIENT MODAL ===================== -->
-<div class="modal fade" id="addPatientModal" tabindex="-1" aria-labelledby="addPatientModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <form id="addPatientForm" asp-action="AddPatient" asp-controller="Receptionist" method="post">
-                @Html.AntiForgeryToken()
-                <div class="modal-header">
-                    <h5 class="modal-title" id="addPatientModalLabel">Add New Patient</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label class="form-label">MMR No</label>
-                        <input type="text" name="MMRNo" class="form-control" required />
-                    </div>
+            <input type="text"
+                   name="mmrNo"
+                   class="form-control"
+                   placeholder="Search by MMR No"
+                   value="@mmrNo" />
 
-                    <div class="mb-3">
-                        <label class="form-label">Name</label>
-                        <input type="text" name="PatientName" class="form-control" required />
-                    </div>
+            <input type="text"
+                   name="phone"
+                   class="form-control"
+                   placeholder="Search by Phone"
+                   value="@phone" />
 
-                    <div class="mb-3">
-                        <label class="form-label">Gender</label>
-                        @Html.DropDownList("Gender", new SelectList(genderList), "-- Select Gender --",
-                        new { @class = "form-select", required = "required" })
-                    </div>
+            <button type="submit" class="btn btn-primary">
+                <i class="bi bi-search"></i> Search
+            </button>
+        </form>
 
-                    <div class="mb-3">
-                        <label class="form-label">Date of Birth</label>
-                        <input type="date" name="DOB" class="form-control" required min="1950-01-01"
-                               max="@DateTime.Now.ToString("yyyy-MM-dd")" />
-                    </div>
+        <!-- Add Patient -->
+        <button class="btn btn-primary"
+                data-bs-toggle="modal"
+                data-bs-target="#addPatientModal">
+            <i class="bi bi-person-plus"></i> Add New Patient
+        </button>
 
-                    <!-- Phone Validation -->
-                    <div class="mb-3">
-                        <label class="form-label">Phone</label>
-                        <input type="text" id="ContactNumber" name="ContactNumber"
-                               class="form-control"
-                               required minlength="10" maxlength="10"
-                               pattern="[0-9]{10}"
-                               title="Enter a valid 10-digit phone number" />
-                        <small id="phoneError" class="text-danger"></small>
-                    </div>
-
-                    <!-- Blood Group Validation -->
-                    <div class="mb-3">
-                        <label class="form-label">Blood Group</label>
-                        <input type="text" id="BloodGroup" name="BloodGroup"
-                               class="form-control"
-                               required
-                               title="Enter a valid blood group (A+, A-, B+, B-, AB+, AB-, O+, O-)" />
-                        <small id="bloodError" class="text-danger"></small>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Address</label>
-                        <textarea name="Address" class="form-control" rows="2" maxlength="200"></textarea>
-                    </div>
-                </div>
-
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary">Add Patient</button>
-                </div>
-            </form>
-        </div>
     </div>
 </div>
 
-<!-- Add Patient Validation Script -->
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const form = document.getElementById("addPatientForm");
-        const phoneInput = document.getElementById("ContactNumber");
-        const bloodInput = document.getElementById("BloodGroup");
-        const phoneError = document.getElementById("phoneError");
-        const bloodError = document.getElementById("bloodError");
+<!-- ================= PATIENT TABLE CARD ================= -->
+<div class="card shadow-sm">
+    <div class="card-body p-0">
 
-        form.addEventListener("submit", function (event) {
-            const phone = phoneInput.value.trim();
-            const blood = bloodInput.value.trim().toUpperCase();
-            bloodInput.value = blood;
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>MMR No</th>
+                        <th>Name</th>
+                        <th>Gender</th>
+                        <th>DOB</th>
+                        <th>Phone</th>
+                        <th>Address</th>
+                        <th>Blood Group</th>
+                        <th class="text-center" style="width: 260px;">Actions</th>
+                    </tr>
+                </thead>
 
-            const phonePattern = /^[0-9]{10}$/;
-            const sequential = "1234567890";
-            const bloodPattern = /^(A|B|AB|O)[+-]$/i;
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var patient in Model)
+                        {
+                            <tr>
+                                <td>@patient.MMRNo</td>
+                                <td>@patient.PatientName</td>
+                                <td>@patient.Gender</td>
+                                <td>@(patient.DOB != DateTime.MinValue ? patient.DOB.ToString("dd/MM/yyyy") : "")</td>
+                                <td>@patient.ContactNumber</td>
+                                <td>@patient.Address</td>
+                                <td>@patient.BloodGroup</td>
 
-            let isValid = true;
+                                <td class="text-center">
 
-            // Phone validation
-            if (!phonePattern.test(phone)) {
-                phoneError.textContent = "Phone number must contain exactly 10 digits.";
-                isValid = false;
-            } else if (/^(\d)\1{9}$/.test(phone)) {
-                phoneError.textContent = "Phone number cannot be all same digits.";
-                isValid = false;
-            } else if (phone === sequential) {
-                phoneError.textContent = "Sequential numbers like 1234567890 are not allowed.";
-                isValid = false;
-            } else if (phone.startsWith("0")) {
-                phoneError.textContent = "Phone number cannot start with 0.";
-                isValid = false;
-            } else {
-                phoneError.textContent = "";
-            }
+                                    <!-- Create Appointment -->
+                                    <a class="btn btn-sm btn-primary mb-1"
+                                       asp-action="TodayAppointments"
+                                       asp-controller="Receptionist"
+                                       asp-route-patientId="@patient.PatientId"
+                                       asp-route-slotDate="@DateTime.Today.ToString("yyyy-MM-dd")">
+                                        <i class="bi bi-calendar-plus"></i>
+                                    </a>
 
-            // Blood group validation
-            if (!bloodPattern.test(blood)) {
-                bloodError.textContent = "Enter valid blood group (A+, A-, B+, B-, AB+, AB-, O+, O-)";
-                isValid = false;
-            } else {
-                bloodError.textContent = "";
-            }
+                                    <!-- Edit -->
+                                    <button type="button"
+                                            class="btn btn-sm btn-warning mb-1"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#editPatientModal_@patient.PatientId">
+                                        <i class="bi bi-pencil-square"></i>
+                                    </button>
 
-            if (!isValid) event.preventDefault();
-        });
-    });
-</script>
-
-<!-- ===================== PATIENTS TABLE ===================== -->
-<table class="table table-bordered table-striped">
-    <thead class="table-light text-center">
-        <tr>
-            <th>MMR No</th>
-            <th>Name</th>
-            <th>Gender</th>
-            <th>DOB</th>
-            <th>Phone</th>
-            <th>Address</th>
-            <th>Blood Group</th>
-            <th style="width: 260px;">Actions</th>
-        </tr>
-    </thead>
-
-    <tbody>
-        @if (Model != null && Model.Any())
-        {
-            foreach (var patient in Model)
-            {
-                <tr>
-                    <td>@patient.MMRNo</td>
-                    <td>@patient.PatientName</td>
-                    <td>@patient.Gender</td>
-                    <td>@(patient.DOB != DateTime.MinValue ? patient.DOB.ToString("dd/MM/yyyy") : "")</td>
-                    <td>@patient.ContactNumber</td>
-                    <td>@patient.Address</td>
-                    <td>@patient.BloodGroup</td>
-
-                    <!-- ✅ ONLY ONE actions cell (Create Appointment + Edit) -->
-                    <td class="text-center">
-
-                        <!-- Create Appointment -->
-                        <a class="btn btn-sm btn-primary mb-1"
-                           asp-action="TodayAppointments"
-                           asp-controller="Receptionist"
-                           asp-route-patientId="@patient.PatientId"
-                           asp-route-slotDate="@DateTime.Today.ToString("yyyy-MM-dd")">
-                            <i class="bi bi-calendar-plus"></i> Create Appointment
-                        </a>
-
-                        <!-- ✅ Edit (ONLY Phone + Address editable) -->
-                        <button type="button"
-                                class="btn btn-sm btn-warning mb-1"
-                                data-bs-toggle="modal"
-                                data-bs-target="#editPatientModal_@patient.PatientId">
-                            <i class="bi bi-pencil-square"></i> Edit
-                        </button>
-
-                        <!-- ===================== EDIT MODAL ===================== -->
+                                    <!-- (Your existing Edit Modal + Scripts remain EXACTLY same below) -->
+                                    <!-- ===================== EDIT MODAL ===================== -->
                         <div class="modal fade"
                              id="editPatientModal_@patient.PatientId"
                              tabindex="-1"
@@ -338,13 +254,20 @@
 
                     </td>
                 </tr>
-            }
-        }
-        else
-        {
-            <tr>
-                <td colspan="8" class="text-center text-muted">No patients found.</td>
-            </tr>
-        }
-    </tbody>
-</table>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="8" class="text-center text-muted py-4">
+                                <i class="bi bi-inbox fs-4"></i>
+                                <div>No patients found.</div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</div>
