@@ -284,6 +284,42 @@
         </div>
     </div>
 </div>
+<h4 class="mt-4">🧪 Lab Results</h4>
+
+@if (ViewBag.LabResults != null && ViewBag.LabResults.Count > 0)
+{
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Test</th>
+                <th>Result</th>
+                <th>Normal Range</th>
+                <th>Remarks</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in ViewBag.LabResults)
+            {
+                <tr>
+                    <td>@item.TestName</td>
+                    <td>
+                        @(item.ActualValue ?? "Pending")
+                    </td>
+                    <td>@item.NormalRange</td>
+                    <td>@item.Remarks</td>
+                    <td>@item.Status</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <div class="alert alert-warning">
+        No Lab Tests Prescribed.
+    </div>
+}
 
 <!-- ============================= -->
 <!-- ✅ Patient History -->

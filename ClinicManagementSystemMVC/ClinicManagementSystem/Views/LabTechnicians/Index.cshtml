@@ -14,7 +14,7 @@
 
     <!-- HEADER -->
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="fw-bold text-primary">Lab Technician Control Panel</h2>
+        <h2 class="fw-bold text-primary">Lab Technician DashBoard</h2>
         <a href="@Url.Action("Logout", "Account")" class="btn btn-danger">Logout</a>
     </div>
 
@@ -38,114 +38,242 @@
 
     <!-- ================== PENDING SECTION ================== -->
     <div id="pendingSection" class="section-block">
-        <h4 class="fw-bold mb-3">Pending Lab Prescriptions</h4>
 
-        <input type="text" id="searchPending" class="form-control mb-3"
-               placeholder="Live search pending tests..." />
+        <h4 class="fw-bold mb-3 text-warning">
+            Pending Lab Prescriptions
+        </h4>
 
-        <div class="row">
-            @if (pending != null && pending.Count > 0)
-            {
-                foreach (var p in pending)
-                {
-                    <div class="col-md-4 mb-4 pending-card">
-                        <div class="card shadow-sm border-0">
-                            <div class="card-body">
-                                <h6 class="fw-bold text-primary">
-                                    Prescription #@p.PrescriptionId
-                                </h6>
+        <input type="text"
+               id="searchPending"
+               class="form-control mb-3 shadow-sm"
+               placeholder="Search pending tests..." />
 
-                                <p><strong>Patient:</strong> @p.PatientName</p>
-                                <p><strong>Doctor:</strong> @p.DoctorName</p>
-                                <p><strong>Test:</strong> @p.TestName</p>
-                                <p><strong>Normal Range:</strong> @p.NormalRange</p>
-                                <p><strong>Price:</strong> ₹ @p.Price</p>
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover align-middle">
+                <thead class="table-warning text-center">
+                    <tr>
+                        <th>Prescription No</th>
+                        <th>Patient</th>
+                        <th>Doctor</th>
+                        <th>Test</th>
+                        <th>Normal Range</th>
+                        <th>Price (₹)</th>
+                        <th width="150">Action</th>
+                    </tr>
+                </thead>
 
-                                <button class="btn btn-warning w-100 mt-2 openResultModal"
-                                        data-prescription="@p.PrescriptionId"
-                                        data-test="@p.TestId"
-                                        data-patient="@p.PatientId"
-                                        data-price="@p.Price"
-                                        data-range="@p.NormalRange">
-                                    Add Result
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                }
-            }
-            else
-            {
-                <p class="text-muted">No Pending Tests</p>
-            }
+                <tbody>
+                    @if (pending != null && pending.Count > 0)
+                    {
+                        foreach (var p in pending)
+                        {
+                            <tr>
+                                <td class="fw-bold text-primary">
+                                    Pr-@p.PrescriptionId
+                                </td>
+
+                                <td>@p.PatientName</td>
+                                <td>@p.DoctorName</td>
+                                <td>@p.TestName</td>
+                                <td>@p.NormalRange</td>
+                                <td class="fw-semibold">
+                                    ₹ @p.Price
+                                </td>
+
+                                <td class="text-center">
+                                    <button class="btn btn-warning btn-sm openResultModal"
+                                            data-prescription="@p.PrescriptionId"
+                                            data-test="@p.TestId"
+                                            data-patient="@p.PatientId"
+                                            data-price="@p.Price"
+                                            data-range="@p.NormalRange">
+                                        <i class="fas fa-plus-circle"></i> Add Result
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="7" class="text-center text-muted">
+                                No Pending Tests
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
         </div>
+
     </div>
+
 
     <!-- ================== COMPLETED SECTION ================== -->
     <div id="completedSection" class="section-block d-none">
-        <h4 class="fw-bold mb-3 text-success">Completed Lab Tests</h4>
+
+        <h4 class="fw-bold mb-3 text-success">
+            Completed Lab Tests
+        </h4>
 
         <input type="text"
                id="searchCompleted"
-               class="form-control mb-4 shadow-sm"
+               class="form-control mb-3 shadow-sm"
                placeholder="Search completed tests..." />
 
-        <div class="row">
-            @if (completed != null && completed.Count > 0)
-            {
-                foreach (var c in completed)
-                {
-                    <div class="col-md-4 mb-4 completed-card">
-                        <div class="card shadow border-0 bg-light hover-shadow">
-                            <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover align-middle">
 
-                                <h6 class="fw-bold text-success mb-3">
-                                    Prescription #@c.PrescriptionId
-                                </h6>
+                <thead class="table-success text-center">
+                    <tr>
+                        <th>Prescription No</th>
+                        <th>Patient</th>
+                        <th>Doctor</th>
+                        <th>Test</th>
+                        <th>Actual Value</th>
+                        <th>Remarks</th>
+                        <th>Price (₹)</th>
+                        <th>Result Date</th>
+                        <th>Date</th>
+                        <th width="140">Action</th>
+                    </tr>
+                </thead>
 
-                                <p><strong>Patient:</strong> @c.PatientName</p>
-                                <p><strong>Doctor:</strong> @c.DoctorName</p>
-                                <p><strong>Test:</strong> @c.TestName</p>
-                                <p><strong>Actual Value:</strong> @c.ActualValue</p>
-                                <p><strong>Remarks:</strong> @c.Remarks</p>
-                                <p><strong>Price:</strong> ₹ @c.Price</p>
-                                <p><strong>Result Date:</strong> @c.ResultDate?.ToString("dd/MM/yyyy")</p>
-                                <p><strong>Date:</strong> @c.PrescribedDate.ToString("dd/MM/yyyy")</p>
+                <tbody>
+                    @if (completed != null && completed.Count > 0)
+                    {
+                        foreach (var c in completed)
+                        {
+                            <tr>
+                                <td class="fw-bold text-success">
+                                    Pr-@c.PrescriptionId
+                                </td>
 
-                                <!-- VIEW REPORT -->
-                                <button class="btn btn-dark w-100 mb-2 viewReportBtn"
-                                        data-result="@c.ResultId">
-                                    <i class="fas fa-eye"></i> View Lab Report
-                                </button>
+                                <td>@c.PatientName</td>
 
-                                <!-- GENERATE BILL -->
-                                <button class="btn btn-primary w-100 mb-2 generateBillBtn"
-                                        data-result="@c.ResultId"
-                                        data-amount="@c.Price">
-                                    <i class="fas fa-file-invoice"></i> Generate Bill
-                                </button>
+                                <td>@c.DoctorName</td>
 
-                                <!-- DOWNLOAD PDF -->
-                                <button class="btn btn-info w-100"
-                                        onclick="window.open('/LabTechnicians/PrintLabBill?resultId=@c.ResultId','_blank')">
-                                    <i class="fas fa-download"></i> Download PDF
-                                </button>
+                                <td>@c.TestName</td>
 
-                            </div>
-                        </div>
-                    </div>
-                }
-            }
-            else
-            {
-                <div class="col-12 text-center text-muted">
-                    No Completed Tests
-                </div>
-            }
+                                <td class="fw-semibold">
+                                    @c.ActualValue
+                                </td>
+
+                                <td>@c.Remarks</td>
+
+                                <td class="fw-semibold">
+                                    ₹ @c.Price
+                                </td>
+
+                                <td>
+                                    @c.ResultDate?.ToString("dd/MM/yyyy")
+                                </td>
+
+                                <td>
+                                    @c.PrescribedDate.ToString("dd/MM/yyyy")
+                                </td>
+
+                                <td class="text-center">
+                                    <button class="btn btn-secondary btn-sm"
+                                            onclick="openPrintPreview(@c.ResultId)">
+                                        <i class="fas fa-print"></i> Print
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="10" class="text-center text-muted">
+                                No Completed Tests
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+
+            </table>
         </div>
+
     </div>
 
+
 </div>
+
+<!-- ================== PRINT PREVIEW MODAL ================== -->
+<div class="modal fade"
+     id="printPreviewModal"
+     data-bs-backdrop="static"
+     data-bs-keyboard="false"
+     tabindex="-1">
+
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+
+            <div class="modal-body" id="printArea">
+
+                <div class="text-center mb-4">
+                    <h3 class="fw-bold">Wellness Clinic</h3>
+                    <p class="text-muted">Official Lab Report</p>
+                    <hr />
+                </div>
+
+                <table class="table table-bordered">
+                    <tr>
+                        <th>Prescription No</th>
+                        <td id="pPrescription"></td>
+                    </tr>
+                    <tr>
+                        <th>Patient</th>
+                        <td id="pPatient"></td>
+                    </tr>
+                    <tr>
+                        <th>Doctor</th>
+                        <td id="pDoctor"></td>
+                    </tr>
+                    <tr>
+                        <th>Test</th>
+                        <td id="pTest"></td>
+                    </tr>
+                    <tr>
+                        <th>Normal Range</th>
+                        <td id="pRange"></td>
+                    </tr>
+                    <tr>
+                        <th>Actual Value</th>
+                        <td id="pActual"></td>
+                    </tr>
+                    <tr>
+                        <th>Remarks</th>
+                        <td id="pRemarks"></td>
+                    </tr>
+                    <tr>
+                        <th>Price</th>
+                        <td id="pPrice"></td>
+                    </tr>
+                    <tr>
+                        <th>Result Date</th>
+                        <td id="pResultDate"></td>
+                    </tr>
+                </table>
+
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn btn-primary"
+                        onclick="printReportContent()">
+                    <i class="fas fa-print"></i> Print
+                </button>
+
+                <button class="btn btn-danger"
+                        data-bs-dismiss="modal">
+                    Close
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
 
 <!-- ================== RESULT MODAL ================== -->
 <div class="modal fade" id="resultModal" data-bs-backdrop="static"
@@ -283,6 +411,45 @@
 
     <script>
 
+        function openPrintPreview(resultId) {
+
+            $.get('/LabTechnicians/GetLabReportDetails',
+                { resultId: resultId },
+                function (res) {
+
+                    if (res.success) {
+
+                        $('#pPrescription').text("Pr-" + res.prescriptionId);
+                        $('#pPatient').text(res.patientName);
+                        $('#pDoctor').text(res.doctorName);
+                        $('#pTest').text(res.testName);
+                        $('#pRange').text(res.normalRange);
+                        $('#pActual').text(res.actualValue);
+                        $('#pRemarks').text(res.remarks);
+                        $('#pPrice').text("₹ " + res.bill);
+                        $('#pResultDate').text(res.date);
+
+                        var modal = new bootstrap.Modal(
+                            document.getElementById('printPreviewModal')
+                        );
+                        modal.show();
+                    }
+                });
+        }
+
+        function printReportContent() {
+
+            var printContents = document.getElementById('printArea').innerHTML;
+            var originalContents = document.body.innerHTML;
+
+            document.body.innerHTML = printContents;
+            window.print();
+            document.body.innerHTML = originalContents;
+
+            location.reload();
+        }
+
+
         function showSection(sectionId){
             $('.section-block').addClass('d-none');
             $('#' + sectionId).removeClass('d-none');
@@ -292,20 +459,66 @@
 
             showSection('pendingSection');
 
-            // Live search
+            // Live search - Pending Table
             $("#searchPending").on("keyup", function () {
+
                 var value = $(this).val().toLowerCase();
-                $(".pending-card").filter(function () {
-                    $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+                var rows = $("#pendingSection table tbody tr");
+                var visibleRows = 0;
+
+                rows.each(function () {
+
+                    if ($(this).text().toLowerCase().indexOf(value) > -1) {
+                        $(this).show();
+                        visibleRows++;
+                    } else {
+                        $(this).hide();
+                    }
+
                 });
+
+                // Remove old message if exists
+                $("#pendingNoData").remove();
+
+                // If no rows visible, show message
+                if (visibleRows === 0) {
+                    $("#pendingSection table tbody").append(
+                        '<tr id="pendingNoData"><td colspan="10" class="text-center text-danger fw-semibold">No matching records found</td></tr>'
+                    );
+                }
+
             });
 
+
+            // Live search - Completed Table
             $("#searchCompleted").on("keyup", function () {
+
                 var value = $(this).val().toLowerCase();
-                $(".completed-card").filter(function () {
-                    $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+                var rows = $("#completedSection table tbody tr");
+                var visibleRows = 0;
+
+                rows.each(function () {
+
+                    if ($(this).text().toLowerCase().indexOf(value) > -1) {
+                        $(this).show();
+                        visibleRows++;
+                    } else {
+                        $(this).hide();
+                    }
+
                 });
+
+                // Remove old message if exists
+                $("#completedNoData").remove();
+
+                if (visibleRows === 0) {
+                    $("#completedSection table tbody").append(
+                        '<tr id="completedNoData"><td colspan="10" class="text-center text-danger fw-semibold">No matching records found</td></tr>'
+                    );
+                }
+
             });
+
 
             // Open modal
             $('.openResultModal').click(function(){
@@ -342,11 +555,16 @@
                                   "success")
                         .then(()=>{
                             window.open('/LabTechnicians/PrintLabBill?resultId='
-                                         + $('#rPrescriptionId').val(),
+                                         + res.resultId,
                                          '_blank');
                             location.reload();
                         });
                     }
+                    else{
+            Swal.fire("Error",
+                      "Something went wrong!",
+                      "error");
+        }
                 });
             });
 

@@ -51,6 +51,7 @@ namespace ClinicManagementSystem.Controllers
             // ✅ NEW: Medicine + Lab History
             ViewBag.MedicineHistory = _service.GetPatientMedicineHistory(patientId);
             ViewBag.LabHistory = _service.GetPatientLabHistory(patientId);
+            ViewBag.LabResults = _service.GetLabResultsByAppointment(appointmentId);
 
 
             // ✅ Load Existing Diagnosis (if already saved)

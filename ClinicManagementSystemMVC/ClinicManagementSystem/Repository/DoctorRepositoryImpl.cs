@@ -382,7 +382,37 @@ namespace ClinicManagementSystem.Repositories
             return patient;
         }
 
+        // =====================================================
+        // ✅ Get Lab Results For This Appointment
+        // =====================================================
+        public List<DoctorLabResultViewModel> GetLabResultsByAppointment(int appointmentId)
+        {
+            List<DoctorLabResultViewModel> list = new();
 
+            using SqlConnection con = new SqlConnection(_ConnectionString);
+
+            SqlCommand cmd = new SqlCommand("sp_GetLabResultsByAppointment", con);
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.Parameters.AddWithValue("@AppointmentId", appointmentId);
+
+            con.Open();
+            SqlDataReader dr = cmd.ExecuteReader();
+
+            while (dr.Read())
+            {
+                list.Add(new DoctorLabResultViewModel()
+                {
+                    TestName = dr["TestName"].ToString(),
+                    Status = dr["Status"].ToString(),
+                    ActualValue = dr["ActualValue"] == DBNull.Value ? null : dr["ActualValue"].ToString(),
+                    NormalRange = dr["NormalRange"].ToString(),
+                    Remarks = dr["Remarks"] == DBNull.Value ? null : dr["Remarks"].ToString(),
+                    ResultDate = dr["Date"] == DBNull.Value ? null : Convert.ToDateTime(dr["Date"])
+                });
+            }
+
+            return list;
+        }
 
         // =====================================================
         // ✅ Mark Appointment Completed

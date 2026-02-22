@@ -91,7 +91,10 @@ namespace ClinicManagementSystem.Services
             return _repo.GetPatientLabHistory(patientId);
         }
 
-
+        public List<DoctorLabResultViewModel> GetLabResultsByAppointment(int appointmentId)
+        {
+            return _repo.GetLabResultsByAppointment(appointmentId);
+        }
         // ===============================
         // Dashboard
         // ===============================

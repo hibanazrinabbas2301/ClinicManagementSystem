@@ -47,9 +47,7 @@ namespace ClinicManagementSystem.Repositories
 
         List<LabPrescription> GetPatientLabHistory(int patientId);
 
-
-
-        // ===============================
+        List<DoctorLabResultViewModel> GetLabResultsByAppointment(int appointmentId);        // ===============================
         // Appointment Completion
         // ===============================
         void MarkAppointmentCompleted(int appointmentId);

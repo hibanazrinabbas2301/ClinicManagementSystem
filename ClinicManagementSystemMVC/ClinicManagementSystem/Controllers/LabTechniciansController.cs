@@ -122,7 +122,11 @@ namespace ClinicManagementSystem.Controllers
                 decimal amount = result.ActualValue; // Or pass Price from UI
                 _labTechnicianService.CreateLabBill(resultId, amount);
 
-                return Json(new { success = true, resultId, amount });
+                return Json(new
+                {
+                    success = true,
+                    resultId = resultId   // ✅ RETURN THIS
+                });
             }
 
             return Json(new { success = false });
@@ -305,18 +309,25 @@ namespace ClinicManagementSystem.Controllers
                         .SelectAllLabTests()
                         .FirstOrDefault(t => t.TestId == result.TestId);
 
+            var prescription = _labTechnicianService
+                               .SelectCompletedTests()
+                               .FirstOrDefault(p => p.ResultId == resultId);
+
             return Json(new
             {
                 success = true,
-                patientId = result.PatientId,
-                testName = test?.TestName,
-                normalRange = result.NormalRange,
+                prescriptionId = prescription?.PrescriptionId,
+                patientName = prescription?.PatientName,
+                doctorName = prescription?.DoctorName,
+                testName = prescription?.TestName,
+                normalRange = prescription?.NormalRange,
                 actualValue = result.ActualValue,
                 remarks = result.Remarks,
-                date = result.Date.ToString("dd/MM/yyyy"),
-                bill = test?.Price
+                bill = test?.Price,
+                date = result.Date.ToString("dd/MM/yyyy")
             });
         }
+
 
         #endregion
 

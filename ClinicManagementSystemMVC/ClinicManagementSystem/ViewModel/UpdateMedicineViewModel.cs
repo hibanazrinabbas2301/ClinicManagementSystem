@@ -33,6 +33,16 @@ namespace ClinicManagementSystem.ViewModel
         // ✅ Expiry must be future date (optional)
         [DataType(DataType.Date)]
         public DateTime? NewExpiry { get; set; }
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            if (NewExpiry.HasValue && NewExpiry.Value.Date < DateTime.Today)
+            {
+                yield return new ValidationResult(
+                    "New expiry date cannot be in the past",
+                    new[] { nameof(NewExpiry) }
+                );
+            }
+        }
     }
 }
 

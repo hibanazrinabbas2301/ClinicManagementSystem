@@ -111,7 +111,10 @@
 
                     <div class="mb-3">
                         <label>Expiry</label>
-                        <input type="date" class="form-control" name="ExpiryDate" required />
+                        <input type="date" class="form-control" name="ExpiryDate" required
+                               min="@DateTime.Today.ToString("yyyy-MM-dd")" />
+                        
+
                         <span class="text-danger" id="expiryError"></span>
                     </div>
 
@@ -200,7 +203,8 @@
                         <label>New Expiry</label>
                         <input type="date"
                                class="form-control"
-                               name="NewExpiry" />
+                               name="NewExpiry"
+                               min="@DateTime.Today.ToString("yyyy-MM-dd")" />
                         <span class="text-danger" id="editExpiryError"></span>
                     </div>
 
@@ -335,56 +339,62 @@
                 $("#editMedicineModal").modal("show");
             });
 
-            // ===================== UPDATE MEDICINE =====================
+                          // ================= UPDATE MEDICINE =================
 
-                   $("#updateMedicine").click(function () {
+            $("#updateMedicine").click(function () {
 
-            $("#editStockError").text("");
-            $("#editPriceError").text("");
-            $("#editExpiryError").text("");
+                $("#editStockError").text("");
+                $("#editPriceError").text("");
+                $("#editExpiryError").text("");
 
-            var formData = $("#editMedicineForm").serialize();
+                var formData = $("#editMedicineForm").serialize();
 
-            $.ajax({
-                url: "/Pharmacist/UpdateMedicine",
-                type: "POST",
-                data: formData,
-                success: function (response) {
+                $.ajax({
+                    url: "/Pharmacist/UpdateMedicine",
+                    type: "POST",
+                    data: formData,
 
-                    console.log("Update Response:", response);
+                    success: function (response) {
 
-                    if (response.success === true) {
+                        console.log("Update Response:", response);
 
-                        $("#editMedicineModal").modal("hide");
-                        showSuccess("Medicine updated successfully!");
+                        if (response.success === true) {
 
-                        setTimeout(function () {
-                            location.reload();
-                        }, 1500);
-                    }
-                    else {
+                            $("#editMedicineModal").modal("hide");
+                            showSuccess("Medicine updated successfully!");
 
-                        if (response.errors) {
-
-                            if (response.errors.AddedQuantity) {
-                                $("#editStockError").text(response.errors.AddedQuantity[0]);
-                            }
-
-                            if (response.errors.NewPrice) {
-                                $("#editPriceError").text(response.errors.NewPrice[0]);
-                            }
-
-                            if (response.errors.NewExpiry) {
-                                $("#editExpiryError").text(response.errors.NewExpiry[0]);
-                            }
+                            setTimeout(function () {
+                                location.reload();
+                            }, 1500);
                         }
+                        else if (response.errors) {
+
+                            response.errors.forEach(function (err) {
+
+                                var lower = err.toLowerCase();
+
+                                if (lower.includes("quantity")) {
+                                    $("#editStockError").text(err);
+                                }
+
+                                if (lower.includes("price")) {
+                                    $("#editPriceError").text(err);
+                                }
+
+                                if (lower.includes("expiry")) {
+                                    $("#editExpiryError").text(err);
+                                }
+                            });
+                        }
+                    },
+
+                    error: function (xhr) {
+                        console.log("Server Error:", xhr.responseText);
+                        alert("Something went wrong while updating.");
                     }
-                },
-                error: function (xhr) {
-                    console.log("Server Error:", xhr.responseText);
-                }
+                });
+
             });
-        });
 
         });
     </script>
