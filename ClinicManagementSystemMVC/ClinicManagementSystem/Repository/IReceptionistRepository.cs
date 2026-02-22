@@ -26,5 +26,10 @@ namespace ClinicManagementSystem_Final.Repository
 
         List<SlotViewModel> GetAvailableSlots();
         List<SlotViewModel> GetAvailableDoctorSlots(DateTime slotDate);
+
+        List<AppointmentViewModel> GetTodaysAppointments();
+        List<AppointmentViewModel> GetUpcomingAppointments();
+
+        List<AppointmentViewModel> SearchAppointments(string searchText, string type);
     }
 }

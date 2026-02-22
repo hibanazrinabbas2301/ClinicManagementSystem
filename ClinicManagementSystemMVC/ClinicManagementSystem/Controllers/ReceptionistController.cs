@@ -74,12 +74,12 @@ namespace ClinicManagementSystem_Final.Controllers
             return RedirectToAction(nameof(Patients));
         }
         // Update patient (GET)
-        public IActionResult EditPatient(int id)
-        {
-            var patient = _receptionistService.GetPatientById(id);
-            if (patient == null) return NotFound();
-            return View(patient);
-        }
+        //public IActionResult EditPatient(int id)
+        //{
+        //    var patient = _receptionistService.GetPatientById(id);
+        //    if (patient == null) return NotFound();
+        //    return View(patient);
+        //}
 
         // Update patient (POST)
         [HttpPost]
@@ -102,18 +102,19 @@ namespace ClinicManagementSystem_Final.Controllers
 
         // GET: View today's appointments
         [HttpGet]
-        public IActionResult TodayAppointments(DateTime? slotDate)
+        public IActionResult TodayAppointments(DateTime? slotDate, int? patientId)
         {
-            var date = slotDate ?? DateTime.Today;   
+            var date = slotDate ?? DateTime.Today;
 
             ViewBag.SelectedDate = date.ToString("yyyy-MM-dd");
 
             ViewBag.Patients = _receptionistService.GetAllPatients() ?? new List<Patient>();
-
             ViewBag.Slots = _receptionistService.GetAvailableDoctorSlots(date) ?? new List<SlotViewModel>();
 
-            var appointments = _receptionistService.GetAppointmentsByDate(date) ?? new List<AppointmentViewModel>();
+            ViewBag.SelectedPatientId = patientId;
+            ViewBag.OpenBookModal = patientId.HasValue;
 
+            var appointments = _receptionistService.GetAppointmentsByDate(date) ?? new List<AppointmentViewModel>();
             return View(appointments);
         }
 
@@ -223,6 +224,61 @@ namespace ClinicManagementSystem_Final.Controllers
             return RedirectToAction(nameof(ViewConsultationBill), new { appointmentId });
         }
 
+        //[HttpGet]
+        //public IActionResult TodaysAppointments()
+        //{
+        //    LoadPatientsDropdown();
 
+        //    var model = _receptionistService.GetTodaysAppointments();
+        //    return View(model);
+        //}
+
+        [HttpGet]
+        public IActionResult UpcomingAppointments()
+        {
+            var model = _receptionistService.GetUpcomingAppointments();
+            return View(model);
+        }
+
+        [HttpGet]
+        public IActionResult AppointmentSearch(string searchText, string type = "ALL")
+        {
+            var date = DateTime.Today;
+
+            ViewBag.SearchText = searchText;
+            ViewBag.Type = type;
+
+            // VERY IMPORTANT: Always set dropdown data
+            ViewBag.Patients = _receptionistService.GetAllPatients() ?? new List<Patient>();
+            ViewBag.Slots = _receptionistService.GetAvailableDoctorSlots(date) ?? new List<SlotViewModel>();
+            ViewBag.SelectedDate = date.ToString("yyyy-MM-dd");
+
+            var model = _receptionistService.SearchAppointments(searchText, type)
+                        ?? new List<AppointmentViewModel>();
+
+            return View("TodayAppointments", model);
+        }
+
+        private void LoadPatientsDropdown()
+        {
+            // Whatever method you already use to get patients
+            
+            ViewBag.Patients = _receptionistService.GetAllPatients();
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult EditPatientContact(int patientId, string phone, string address)
+        {
+            var existing = _receptionistService.GetPatientById(patientId);
+            if (existing == null) return NotFound();
+
+            existing.ContactNumber = phone;
+            existing.Address = address;
+
+            _receptionistService.UpdatePatient(existing);
+
+            TempData["PatientUpdateSuccess"] = "Patient contact updated successfully!";
+            return RedirectToAction(nameof(Patients));
+        }
     }
 }

@@ -435,5 +435,118 @@ namespace ClinicManagementSystem.Repositories
 
             return slots;
         }
+
+        public List<AppointmentViewModel> GetTodaysAppointments()
+        {
+            var list = new List<AppointmentViewModel>();
+
+            using (SqlConnection con = new SqlConnection(_connectionString))
+            using (SqlCommand cmd = new SqlCommand("sp_ViewTodaysAppointments", con))
+            {
+                cmd.CommandType = CommandType.StoredProcedure;
+                con.Open();
+
+                using (SqlDataReader dr = cmd.ExecuteReader())
+                {
+                    while (dr.Read())
+                    {
+                        list.Add(new AppointmentViewModel
+                        {
+                            AppointmentId = Convert.ToInt32(dr["AppointmentId"]),
+                            PatientId = Convert.ToInt32(dr["PatientId"]),
+                            PatientName = dr["PatientName"].ToString(),
+                            DoctorId = Convert.ToInt32(dr["DoctorId"]),
+                            DoctorName = dr["DoctorName"].ToString(),
+                            SlotId = Convert.ToInt32(dr["SlotId"]),
+                            SlotDate = Convert.ToDateTime(dr["SlotDate"]),
+                            StartTime = TimeSpan.Parse(dr["StartTime"].ToString()),
+                            EndTime = TimeSpan.Parse(dr["EndTime"].ToString()),
+                            TokenNumber = dr["TokenNumber"] == DBNull.Value ? 0 : Convert.ToInt32(dr["TokenNumber"]),
+                            Status = dr["Status"].ToString(),
+                            ConsultationBill = dr["ConsultationBill"] == DBNull.Value ? 0 : Convert.ToDecimal(dr["ConsultationBill"]),
+                            AppointmentDate = Convert.ToDateTime(dr["AppointmentDate"])
+                        });
+                    }
+                }
+            }
+
+            return list;
+        }
+
+        public List<AppointmentViewModel> GetUpcomingAppointments()
+        {
+            var list = new List<AppointmentViewModel>();
+
+            using (SqlConnection con = new SqlConnection(_connectionString))
+            using (SqlCommand cmd = new SqlCommand("sp_ViewUpcomingAppointments", con))
+            {
+                cmd.CommandType = CommandType.StoredProcedure;
+                con.Open();
+
+                using (SqlDataReader dr = cmd.ExecuteReader())
+                {
+                    while (dr.Read())
+                    {
+                        list.Add(new AppointmentViewModel
+                        {
+                            AppointmentId = Convert.ToInt32(dr["AppointmentId"]),
+                            PatientId = Convert.ToInt32(dr["PatientId"]),
+                            PatientName = dr["PatientName"].ToString(),
+                            DoctorId = Convert.ToInt32(dr["DoctorId"]),
+                            DoctorName = dr["DoctorName"].ToString(),
+                            SlotId = Convert.ToInt32(dr["SlotId"]),
+                            SlotDate = Convert.ToDateTime(dr["SlotDate"]),
+                            StartTime = TimeSpan.Parse(dr["StartTime"].ToString()),
+                            EndTime = TimeSpan.Parse(dr["EndTime"].ToString()),
+                            TokenNumber = dr["TokenNumber"] == DBNull.Value ? 0 : Convert.ToInt32(dr["TokenNumber"]),
+                            Status = dr["Status"].ToString(),
+                            ConsultationBill = dr["ConsultationBill"] == DBNull.Value ? 0 : Convert.ToDecimal(dr["ConsultationBill"]),
+                            AppointmentDate = Convert.ToDateTime(dr["AppointmentDate"])
+                        });
+                    }
+                }
+            }
+
+            return list;
+        }
+
+        public List<AppointmentViewModel> SearchAppointments(string searchText, string type)
+        {
+            var list = new List<AppointmentViewModel>();
+
+            using (SqlConnection con = new SqlConnection(_connectionString))
+            using (SqlCommand cmd = new SqlCommand("sp_SearchAppointments", con))
+            {
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@SearchText", string.IsNullOrWhiteSpace(searchText) ? (object)DBNull.Value : searchText);
+                cmd.Parameters.AddWithValue("@Type", string.IsNullOrWhiteSpace(type) ? "ALL" : type);
+
+                con.Open();
+                using (SqlDataReader dr = cmd.ExecuteReader())
+                {
+                    while (dr.Read())
+                    {
+                        list.Add(new AppointmentViewModel
+                        {
+                            AppointmentId = Convert.ToInt32(dr["AppointmentId"]),
+                            PatientId = Convert.ToInt32(dr["PatientId"]),
+                            PatientName = dr["PatientName"].ToString(),
+                            DoctorId = Convert.ToInt32(dr["DoctorId"]),
+                            DoctorName = dr["DoctorName"].ToString(),
+                            SlotId = Convert.ToInt32(dr["SlotId"]),
+                            SlotDate = Convert.ToDateTime(dr["SlotDate"]),
+                            StartTime = (TimeSpan)dr["StartTime"],
+                            EndTime = (TimeSpan)dr["EndTime"],
+                            TokenNumber = dr["TokenNumber"] == DBNull.Value ? null : (int?)Convert.ToInt32(dr["TokenNumber"]),
+                            Status = dr["Status"].ToString(),
+                            ConsultationBill = dr["ConsultationBill"] == DBNull.Value ? 0 : Convert.ToDecimal(dr["ConsultationBill"]),
+                            AppointmentDate = Convert.ToDateTime(dr["AppointmentDate"]),
+                            MMRNo = dr["MMRNo"].ToString()
+                        });
+                    }
+                }
+            }
+            return list;
+        }
     }
 }
