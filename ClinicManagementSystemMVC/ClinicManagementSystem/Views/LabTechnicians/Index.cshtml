@@ -1,346 +1,406 @@
-﻿@model IEnumerable<ClinicManagementSystem.Models.LabTest>
+﻿@model List<ClinicManagementSystem.Models.LabTest>
 
 @{
     ViewData["Title"] = "Lab Technician Panel";
-    var pendingTests = ViewBag.PendingTests as IEnumerable<ClinicManagementSystem.Models.LabTestPrescription>;
-    var completedTests = ViewBag.CompletedTests as IEnumerable<ClinicManagementSystem.Models.LabTestPrescription>;
+    var pending = ViewBag.PendingTests as List<ClinicManagementSystem.Models.LabTestPrescription>;
+    var completed = ViewBag.CompletedTests as List<ClinicManagementSystem.Models.LabTestPrescription>;
 }
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet" />
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-<div class="container-fluid mt-4">
+<div class="container-fluid py-4">
 
-    <h2 class="fw-bold text-primary mb-4">
-        <i class="fas fa-flask"></i> Lab Technician Control Panel
-    </h2>
+    <!-- HEADER -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold text-primary">Lab Technician Control Panel</h2>
+        <a href="@Url.Action("Logout", "Account")" class="btn btn-danger">Logout</a>
+    </div>
 
-    <!-- ================= DASHBOARD CARDS ================= -->
-    <div class="row mb-4">
-
-        <div class="col-md-3">
-            <div class="card dashboard-card bg-primary text-white"
-                 onclick="showSection('availableSection')">
-                <div class="card-body">
-                    <h6>Total Tests</h6>
-                    <h2>@Model.Count()</h2>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-3">
-            <div class="card dashboard-card bg-warning text-dark"
+    <!-- DASHBOARD CARDS -->
+    <div class="row mb-4 text-center">
+        <div class="col-md-6">
+            <div class="card shadow border-0 p-4 dashboard-card bg-warning text-white"
                  onclick="showSection('pendingSection')">
-                <div class="card-body">
-                    <h6>Pending</h6>
-                    <h2>@(pendingTests?.Count(t => t.Status != "Completed") ?? 0)</h2>
-                </div>
+                <h5>Pending Tests</h5>
+                <h1>@(pending?.Count ?? 0)</h1>
             </div>
         </div>
-
-        <div class="col-md-3">
-            <div class="card dashboard-card bg-success text-white"
+        <div class="col-md-6">
+            <div class="card shadow border-0 p-4 dashboard-card bg-success text-white"
                  onclick="showSection('completedSection')">
-                <div class="card-body">
-                    <h6>Completed</h6>
-                    <h2>@(completedTests?.Count() ?? 0)</h2>
-                </div>
+                <h5>Completed Tests</h5>
+                <h1>@(completed?.Count ?? 0)</h1>
             </div>
         </div>
-
-        <div class="col-md-3">
-            <div class="card dashboard-card bg-dark text-white"
-                 onclick="showSection('resultSection')">
-                <div class="card-body">
-                    <h6>Lab Results</h6>
-                    <h2><i class="fas fa-file-medical"></i></h2>
-                </div>
-            </div>
-        </div>
-
     </div>
 
-    <!-- ================= AVAILABLE TESTS ================= -->
-    <div id="availableSection" class="section-block">
+    <!-- ================== PENDING SECTION ================== -->
+    <div id="pendingSection" class="section-block">
+        <h4 class="fw-bold mb-3">Pending Lab Prescriptions</h4>
 
-        <div class="card shadow-lg">
-            <div class="card-header bg-dark text-white">
-                Available Lab Tests
-            </div>
+        <input type="text" id="searchPending" class="form-control mb-3"
+               placeholder="Live search pending tests..." />
 
-            <div class="card-body">
+        <div class="row">
+            @if (pending != null && pending.Count > 0)
+            {
+                foreach (var p in pending)
+                {
+                    <div class="col-md-4 mb-4 pending-card">
+                        <div class="card shadow-sm border-0">
+                            <div class="card-body">
+                                <h6 class="fw-bold text-primary">
+                                    Prescription #@p.PrescriptionId
+                                </h6>
 
-                <input type="text" id="searchAvailable"
-                       class="form-control mb-3"
-                       placeholder="🔍 Search Available Tests">
+                                <p><strong>Patient:</strong> @p.PatientName</p>
+                                <p><strong>Doctor:</strong> @p.DoctorName</p>
+                                <p><strong>Test:</strong> @p.TestName</p>
+                                <p><strong>Normal Range:</strong> @p.NormalRange</p>
+                                <p><strong>Price:</strong> ₹ @p.Price</p>
 
-                <table class="table table-hover">
-                    <thead class="table-dark">
-                        <tr>
-                            <th>Name</th>
-                            <th>Price</th>
-                            <th>Sample</th>
-                            <th>Range</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var test in Model)
-                        {
-                            <tr>
-                                <td>@test.TestName</td>
-                                <td>₹ @test.Price</td>
-                                <td>@test.SampleType</td>
-                                <td>@test.NormalRange</td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-
-            </div>
+                                <button class="btn btn-warning w-100 mt-2 openResultModal"
+                                        data-prescription="@p.PrescriptionId"
+                                        data-test="@p.TestId"
+                                        data-patient="@p.PatientId"
+                                        data-price="@p.Price"
+                                        data-range="@p.NormalRange">
+                                    Add Result
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <p class="text-muted">No Pending Tests</p>
+            }
         </div>
-
     </div>
 
-    <!-- ================= PENDING ================= -->
-    <div id="pendingSection" class="section-block d-none">
-
-        <div class="card shadow-lg">
-            <div class="card-header bg-warning">
-                Pending Tests
-            </div>
-
-            <div class="card-body">
-
-                <input type="text" id="searchPending"
-                       class="form-control mb-3"
-                       placeholder="🔍 Search Pending Tests">
-
-                <div class="table-responsive">
-                    <table class="table table-bordered">
-                        <thead class="table-warning">
-                            <tr>
-                                <th>Patient</th>
-                                <th>Doctor</th>
-                                <th>Test</th>
-                                <th>Price</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var item in pendingTests)
-                            {
-                                <tr>
-                                    <td>@item.PatientName</td>
-                                    <td>@item.DoctorName</td>
-                                    <td>@item.TestName</td>
-                                    <td>₹ @item.Price</td>
-                                    <td>
-                                        <button class="btn btn-success btn-sm addResultBtn"
-                                                data-prescription="@item.PrescriptionId"
-                                                data-test="@item.TestId"
-                                                data-patient="@item.PatientId"
-                                                data-normal="@item.NormalRange"
-                                                data-price="@item.Price">
-                                            Add Result
-                                        </button>
-                                    </td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                </div>
-
-            </div>
-
-        </div>
-
-    </div>
-
-    <!-- ================= COMPLETED ================= -->
+    <!-- ================== COMPLETED SECTION ================== -->
     <div id="completedSection" class="section-block d-none">
+        <h4 class="fw-bold mb-3 text-success">Completed Lab Tests</h4>
 
-        <div class="card shadow-lg">
-            <div class="card-header bg-success text-white">
-                Completed Tests
-            </div>
+        <input type="text"
+               id="searchCompleted"
+               class="form-control mb-4 shadow-sm"
+               placeholder="Search completed tests..." />
 
-            <div class="card-body">
+        <div class="row">
+            @if (completed != null && completed.Count > 0)
+            {
+                foreach (var c in completed)
+                {
+                    <div class="col-md-4 mb-4 completed-card">
+                        <div class="card shadow border-0 bg-light hover-shadow">
+                            <div class="card-body">
 
-                <input type="text" id="searchCompleted"
-                       class="form-control mb-3"
-                       placeholder="🔍 Search Completed Tests">
+                                <h6 class="fw-bold text-success mb-3">
+                                    Prescription #@c.PrescriptionId
+                                </h6>
 
-                <div class="table-responsive">
-                    <table class="table table-bordered">
-                        <thead class="table-success">
-                            <tr>
-                                <th>Patient</th>
-                                <th>Doctor</th>
-                                <th>Test</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var item in completedTests)
-                            {
-                                <tr>
-                                    <td>@item.PatientName</td>
-                                    <td>@item.DoctorName</td>
-                                    <td>@item.TestName</td>
-                                    <td>
-                                        <span class="badge bg-success">
-                                            @item.Status
-                                        </span>
-                                    </td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
+                                <p><strong>Patient:</strong> @c.PatientName</p>
+                                <p><strong>Doctor:</strong> @c.DoctorName</p>
+                                <p><strong>Test:</strong> @c.TestName</p>
+                                <p><strong>Actual Value:</strong> @c.ActualValue</p>
+                                <p><strong>Remarks:</strong> @c.Remarks</p>
+                                <p><strong>Price:</strong> ₹ @c.Price</p>
+                                <p><strong>Result Date:</strong> @c.ResultDate?.ToString("dd/MM/yyyy")</p>
+                                <p><strong>Date:</strong> @c.PrescribedDate.ToString("dd/MM/yyyy")</p>
+
+                                <!-- VIEW REPORT -->
+                                <button class="btn btn-dark w-100 mb-2 viewReportBtn"
+                                        data-result="@c.ResultId">
+                                    <i class="fas fa-eye"></i> View Lab Report
+                                </button>
+
+                                <!-- GENERATE BILL -->
+                                <button class="btn btn-primary w-100 mb-2 generateBillBtn"
+                                        data-result="@c.ResultId"
+                                        data-amount="@c.Price">
+                                    <i class="fas fa-file-invoice"></i> Generate Bill
+                                </button>
+
+                                <!-- DOWNLOAD PDF -->
+                                <button class="btn btn-info w-100"
+                                        onclick="window.open('/LabTechnicians/PrintLabBill?resultId=@c.ResultId','_blank')">
+                                    <i class="fas fa-download"></i> Download PDF
+                                </button>
+
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="col-12 text-center text-muted">
+                    No Completed Tests
                 </div>
-
-            </div>
-
+            }
         </div>
-
     </div>
 
 </div>
 
-<!-- ================= ADD RESULT MODAL ================= -->
-<div class="modal fade"
-     id="addResultModal"
-     data-bs-backdrop="static"
-     data-bs-keyboard="false">
-
+<!-- ================== RESULT MODAL ================== -->
+<div class="modal fade" id="resultModal" data-bs-backdrop="static"
+     data-bs-keyboard="false" tabindex="-1">
     <div class="modal-dialog">
-        <div class="modal-content">
+        <div class="modal-content shadow">
+            <div class="modal-header">
+                <h5>Add Lab Result</h5>
+                <button type="button" class="btn-close"
+                        data-bs-dismiss="modal"></button>
+            </div>
 
-            <form id="resultForm">
-                @Html.AntiForgeryToken()
+            <div class="modal-body">
+                <form id="resultForm">
+                    @Html.AntiForgeryToken()
 
-                <div class="modal-header bg-success text-white">
-                    <h5>Add Lab Result</h5>
-                    <button type="button" class="btn-close btn-close-white"
-                            data-bs-dismiss="modal"></button>
-                </div>
-
-                <div class="modal-body">
-
-                    <input type="hidden" id="rTestId" name="TestId" />
-                    <input type="hidden" id="rPatientId" name="PatientId" />
                     <input type="hidden" id="rPrescriptionId" />
+                    <input type="hidden" id="rTestId" />
+                    <input type="hidden" id="rPatientId" />
+                    <input type="hidden" id="rEmail" />
 
-                    <div class="mb-2">
+                    <div class="mb-3">
                         <label>Normal Range</label>
-                        <input id="rNormalRange" name="NormalRange"
+                        <input type="text" id="rNormalRange"
                                class="form-control" readonly />
                     </div>
 
-                    <div class="mb-2">
+                    <div class="mb-3">
                         <label>Actual Value</label>
-                        <input name="ActualValue"
-                               type="number"
-                               step="0.01"
-                               class="form-control"
-                               required />
+                        <input type="number" id="rActualValue"
+                               class="form-control" required />
                     </div>
 
-                    <div class="mb-2">
+                    <div class="mb-3">
                         <label>Remarks</label>
-                        <textarea name="Remarks"
-                                  class="form-control"></textarea>
+                        <input type="text" id="rRemarks"
+                               class="form-control" />
                     </div>
 
-                    <div class="mb-2">
-                        <label>Bill Amount (₹)</label>
-                        <input id="rBill" class="form-control" readonly />
+                    <div class="mb-3">
+                        <label>Bill Amount</label>
+                        <input type="text" id="rBillAmount"
+                               class="form-control" readonly />
                     </div>
 
-                </div>
-
-                <div class="modal-footer">
                     <button type="submit"
-                            class="btn btn-success">
-                        Save & Generate Report
+                            class="btn btn-success w-100">
+                        Save Result & Generate Report
                     </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!--View Report-->
+<div class="modal fade" id="viewReportModal"
+     data-bs-backdrop="static"
+     data-bs-keyboard="false"
+     tabindex="-1">
+
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content shadow-lg">
+
+            <div class="modal-header bg-dark text-white">
+                <h5 class="modal-title">Lab Test Report</h5>
+                <button type="button"
+                        class="btn-close btn-close-white"
+                        data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+
+                <div id="reportContent">
+
+                    <table class="table table-bordered">
+                        <tr>
+                            <th>Patient Name</th>
+                            <td id="vPatient"></td>
+                        </tr>
+                        <tr>
+                            <th>Doctor Name</th>
+                            <td id="vDoctor"></td>
+                        </tr>
+                        <tr>
+                            <th>Test Name</th>
+                            <td id="vTest"></td>
+                        </tr>
+                        <tr>
+                            <th>Normal Range</th>
+                            <td id="vRange"></td>
+                        </tr>
+                        <tr>
+                            <th>Actual Value</th>
+                            <td id="vActual"></td>
+                        </tr>
+                        <tr>
+                            <th>Remarks</th>
+                            <td id="vRemarks"></td>
+                        </tr>
+                        <tr>
+                            <th>Date</th>
+                            <td id="vDate"></td>
+                        </tr>
+                        <tr>
+                            <th>Bill Amount</th>
+                            <td id="vBill" class="fw-bold text-success"></td>
+                        </tr>
+                    </table>
+
                 </div>
 
-            </form>
+            </div>
 
         </div>
     </div>
 </div>
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
-<script>
 
-    function showSection(sectionId) {
-        $('.section-block').addClass('d-none');
-        $('#' + sectionId).removeClass('d-none');
+<style>
+    .dashboard-card {
+        cursor: pointer;
+        transition: 0.3s;
     }
 
-    $(document).ready(function () {
-        showSection('availableSection');
-    });
+        .dashboard-card:hover {
+            transform: scale(1.05);
+        }
+</style>
 
-    // Live Search
-    $("#searchAvailable").on("keyup", function () {
-        var value = $(this).val().toLowerCase();
-        $("#availableSection tbody tr").filter(function () {
-            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
-        });
-    });
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
-    $("#searchPending").on("keyup", function () {
-        var value = $(this).val().toLowerCase();
-        $("#pendingSection tbody tr").filter(function () {
-            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
-        });
-    });
+    <script>
 
-    $("#searchCompleted").on("keyup", function () {
-        var value = $(this).val().toLowerCase();
-        $("#completedSection tbody tr").filter(function () {
-            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
-        });
-    });
+        function showSection(sectionId){
+            $('.section-block').addClass('d-none');
+            $('#' + sectionId).removeClass('d-none');
+        }
 
-    // Open Add Result Modal
-    $('.addResultBtn').click(function () {
+        $(document).ready(function(){
 
-        $('#rPrescriptionId').val($(this).data('prescription'));
-        $('#rTestId').val($(this).data('test'));
-        $('#rPatientId').val($(this).data('patient'));
-        $('#rNormalRange').val($(this).data('normal'));
-        $('#rBill').val($(this).data('price'));
+            showSection('pendingSection');
 
-        new bootstrap.Modal(document.getElementById('addResultModal')).show();
-    });
-
-    // Save Result + Generate PDF
-    $('#resultForm').submit(function (e) {
-        e.preventDefault();
-
-        let data = $(this).serialize() +
-            "&PrescriptionId=" + $('#rPrescriptionId').val();
-
-        $.post('/LabTechnicians/AddLabResult',
-            data,
-            function (res) {
-
-                if (res.success) {
-
-                    window.open('/LabTechnicians/PrintLabBill?resultId='
-                        + res.resultId, '_blank');
-
-                    showSection('completedSection');
-
-                    location.reload();
-                }
+            // Live search
+            $("#searchPending").on("keyup", function () {
+                var value = $(this).val().toLowerCase();
+                $(".pending-card").filter(function () {
+                    $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+                });
             });
-    });
 
-</script>
+            $("#searchCompleted").on("keyup", function () {
+                var value = $(this).val().toLowerCase();
+                $(".completed-card").filter(function () {
+                    $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+                });
+            });
 
+            // Open modal
+            $('.openResultModal').click(function(){
+                $('#rPrescriptionId').val($(this).data('prescription'));
+                $('#rTestId').val($(this).data('test'));
+                $('#rPatientId').val($(this).data('patient'));
+                $('#rNormalRange').val($(this).data('range'));
+                $('#rBillAmount').val($(this).data('price'));
+                $('#rEmail').val($(this).data('email'));
+
+                var modal = new bootstrap.Modal(document.getElementById('resultModal'));
+                modal.show();
+            });
+
+            // Save result
+            $('#resultForm').submit(function(e){
+                e.preventDefault();
+
+                $.post('/LabTechnicians/AddLabResult',
+                {
+                    TestId: $('#rTestId').val(),
+                    PatientId: $('#rPatientId').val(),
+                    NormalRange: $('#rNormalRange').val(),
+                    ActualValue: $('#rActualValue').val(),
+                    Remarks: $('#rRemarks').val(),
+                    PrescriptionId: $('#rPrescriptionId').val()
+                },
+                function(res){
+
+                    if(res.success){
+
+                        Swal.fire("Success",
+                                  "Result Saved Successfully!",
+                                  "success")
+                        .then(()=>{
+                            window.open('/LabTechnicians/PrintLabBill?resultId='
+                                         + $('#rPrescriptionId').val(),
+                                         '_blank');
+                            location.reload();
+                        });
+                    }
+                });
+            });
+
+                    // View Lab Report Modal
+            $('.viewReportBtn').click(function () {
+
+                var resultId = $(this).data('result');
+
+                $.get('/LabTechnicians/GetLabReportDetails',
+                    { resultId: resultId },
+                    function (res) {
+
+                        if (res.success) {
+
+                            $('#vPatient').text(res.patientName);
+                            $('#vDoctor').text(res.doctorName);
+                            $('#vTest').text(res.testName);
+                            $('#vRange').text(res.normalRange);
+                            $('#vActual').text(res.actualValue);
+                            $('#vRemarks').text(res.remarks);
+                            $('#vDate').text(res.date);
+                            $('#vBill').text("₹ " + res.bill);
+
+                            var modal = new bootstrap.Modal(
+                                document.getElementById('viewReportModal')
+                            );
+                            modal.show();
+                        }
+                    });
+            });
+
+
+            // Generate Bill (DB Insert)
+            $('.generateBillBtn').click(function () {
+
+                var resultId = $(this).data('result');
+                var amount = $(this).data('amount');
+
+                $.post('/LabTechnicians/GenerateLabBill',
+                    { resultId: resultId, amount: amount },
+                    function (res) {
+
+                        if (res.success) {
+                            Swal.fire("Success",
+                                  "Lab Bill Generated!",
+                                  "success");
+                        }
+                    });
+            });
+
+      
+
+
+        });
+
+    </script>
+}

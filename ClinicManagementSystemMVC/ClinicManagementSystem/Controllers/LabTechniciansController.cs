@@ -107,7 +107,7 @@ namespace ClinicManagementSystem.Controllers
         #region Add Lab Result
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        //[ValidateAntiForgeryToken]
         public JsonResult AddLabResult(LabResult result, int PrescriptionId)
         {
             if (ModelState.IsValid)
@@ -286,6 +286,36 @@ namespace ClinicManagementSystem.Controllers
         {
             var reports = _labTechnicianService.SelectPatientLabReports(patientId).ToList();
             return View(reports);
+        }
+
+        #endregion
+
+
+        #region Get Lab Report Details (For Modal)
+
+        [HttpGet]
+        public JsonResult GetLabReportDetails(int resultId)
+        {
+            var result = _labTechnicianService.GetResultById(resultId);
+
+            if (result == null)
+                return Json(new { success = false });
+
+            var test = _labTechnicianService
+                        .SelectAllLabTests()
+                        .FirstOrDefault(t => t.TestId == result.TestId);
+
+            return Json(new
+            {
+                success = true,
+                patientId = result.PatientId,
+                testName = test?.TestName,
+                normalRange = result.NormalRange,
+                actualValue = result.ActualValue,
+                remarks = result.Remarks,
+                date = result.Date.ToString("dd/MM/yyyy"),
+                bill = test?.Price
+            });
         }
 
         #endregion

@@ -18,8 +18,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="ClassLibrary1">
-      <HintPath>..\..\..\..\..\DemoMayJulyConsole2025\ConsoleAppWareHouseManagement\InventoryClassLibraryConnection\bin\Debug\net8.0\ClassLibrary1.dll</HintPath>
+    <Reference Include="ClassLibraryDataBaseConnection">
+      <HintPath>..\..\..\Users\hiban\Downloads\ClassLibraryADOConnectiion\ClassLibraryDataBaseConnection\obj\Debug\net8.0\ClassLibraryDataBaseConnection.dll</HintPath>
     </Reference>
   </ItemGroup>
 
