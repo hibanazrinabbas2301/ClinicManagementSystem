@@ -14,5 +14,6 @@
         public decimal TotalAmount { get; set; }
         public DateTime BillDate { get; set; }
         public bool Paid { get; set; }
+        public string? PatientEmail { get; set; }
     }
 }

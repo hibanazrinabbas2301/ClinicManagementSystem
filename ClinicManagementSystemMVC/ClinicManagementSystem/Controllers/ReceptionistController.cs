@@ -1,5 +1,6 @@
 ﻿using ClinicManagementSystem.Models;
 using ClinicManagementSystem.Security;
+using ClinicManagementSystem.Service;
 using ClinicManagementSystem.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,6 +15,8 @@ namespace ClinicManagementSystem_Final.Controllers
         public ReceptionistController(IReceptionistService receptionistService)
         {
             _receptionistService = receptionistService;
+            
+
         }
 
         // ---------------- Dashboard ----------------
@@ -197,6 +200,28 @@ namespace ClinicManagementSystem_Final.Controllers
             return Json(data);
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult SendBillEmail(int appointmentId, string email)
+        {
+            if (string.IsNullOrWhiteSpace(email))
+            {
+                TempData["ErrorMessage"] = "Please provide an email address.";
+                return RedirectToAction(nameof(ViewConsultationBill), new { appointmentId });
+            }
+
+            try
+            {
+                _receptionistService.SendConsultationBillEmail(appointmentId, email);
+                TempData["SuccessMessage"] = "Bill sent successfully!";
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = ex.Message;
+            }
+
+            return RedirectToAction(nameof(ViewConsultationBill), new { appointmentId });
+        }
 
 
     }

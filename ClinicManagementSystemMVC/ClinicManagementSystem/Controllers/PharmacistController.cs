@@ -30,6 +30,11 @@ namespace ClinicManagementSystem.Controllers
         {
             if (!ModelState.IsValid)
             {
+                return View(model);
+            }
+
+            if (!ModelState.IsValid)
+            {
                 return Json(new { success = false });
             }
 
@@ -64,6 +69,10 @@ namespace ClinicManagementSystem.Controllers
         [HttpPost]
         public IActionResult UpdateMedicine(UpdateMedicineViewModel model)
         {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            } 
             if (!ModelState.IsValid)
                 return Json(new { success = false });
 

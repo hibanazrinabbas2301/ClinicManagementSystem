@@ -1,4 +1,5 @@
 using ClinicManagementSystem.Repositories;
+using ClinicManagementSystem.Service;
 using ClinicManagementSystem.Services;
 using ClinicManagementSystem_Final.Repository;
 
@@ -31,6 +32,7 @@ namespace ClinicManagementSystem
             builder.Services.AddScoped<IReceptionistRepository, ReceptionistRepositoryImpl>();
             //Register Receptionist Service
             builder.Services.AddScoped<IReceptionistService, ReceptionistServiceImpl>();
+            builder.Services.AddScoped<IEmailService, SmtpEmailService>();
 
             builder.Services.AddScoped<IPharmacistRepo, PharmacistRepoImpl>();
             builder.Services.AddScoped<IpharmacistService, PharmacistServiceImpl>();
@@ -59,7 +61,7 @@ namespace ClinicManagementSystem
 
             app.MapControllerRoute(
                 name: "default",
-                pattern: "{controller=LabTechnicians}/{action=Index}/{id?}");
+                pattern: "{controller=Login}/{action=Index}/{id?}");
 
             app.Run();
         }
