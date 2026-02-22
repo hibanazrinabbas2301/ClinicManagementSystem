@@ -103,6 +103,21 @@ namespace ClinicManagementSystem.Services
 
                 _emailService.SendBill(email, bill);
             }
-    
+
+        public List<AppointmentViewModel> GetTodaysAppointments()
+        {
+            return _receptionistRepository.GetTodaysAppointments();
+        }
+
+        public List<AppointmentViewModel> GetUpcomingAppointments()
+        {
+            return _receptionistRepository.GetUpcomingAppointments();
+        }
+
+        public List<AppointmentViewModel> SearchAppointments(string searchText, string type)
+        {
+            return _receptionistRepository.SearchAppointments(searchText, type);
+        }
+
     }
 }

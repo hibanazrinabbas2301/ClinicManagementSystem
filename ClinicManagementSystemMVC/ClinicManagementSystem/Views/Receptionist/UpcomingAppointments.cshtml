@@ -1,0 +1,101 @@
+﻿@model IEnumerable<AppointmentViewModel>
+
+@{
+    ViewData["Title"] = "Upcoming Appointments";
+}
+
+<div class="container mt-4">
+    <h2 class="text-center mb-4">Upcoming Appointments</h2>
+
+    <!-- Alerts -->
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger text-center">@TempData["Error"]</div>
+    }
+    @if (TempData["Message"] != null)
+    {
+        <div class="alert alert-success text-center">@TempData["Message"]</div>
+    }
+
+    <div class="mb-3">
+        <a href="@Url.Action("Index", "Receptionist")" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Dashboard
+        </a>
+
+        <a asp-action="TodayAppointments" asp-controller="Receptionist"
+           class="btn btn-outline-primary ms-2">
+            View Today
+        </a>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+    }
+
+    <!-- Upcoming Appointments Table -->
+    <table class="table table-bordered table-striped text-center">
+        <thead class="table-dark">
+            <tr>
+                <th>Token</th>
+                <th>Patient Name</th>
+                <th>Doctor Name</th>
+                <th>Appointment Date & Time</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @if (Model != null && Model.Any())
+            {
+                foreach (var appointment in Model)
+                {
+                    <tr>
+                        <td>@appointment.TokenNumber</td>
+                        <td>@appointment.PatientName</td>
+                        <td>@appointment.DoctorName</td>
+
+                        <!-- ✅ Correct Date + Time Display -->
+                        <td>
+                            @appointment.SlotDate.ToString("dd/MM/yyyy")
+                            @appointment.StartTime.ToString(@"hh\:mm") -
+                            @appointment.EndTime.ToString(@"hh\:mm")
+                        </td>
+
+                        <td>@appointment.Status</td>
+
+                        <td>
+                            <!-- Optional: Generate bill only if you want it here too -->
+                            <form asp-action="GenerateConsultationBill"
+                                  asp-controller="Receptionist"
+                                  method="post">
+                                @Html.AntiForgeryToken()
+
+                                <input type="hidden" name="patientId" value="@appointment.PatientId" />
+                                <input type="hidden" name="appointmentId" value="@appointment.AppointmentId" />
+                                <input type="hidden" name="consultationFee" value="500" />
+
+                                <button type="submit" class="btn btn-sm btn-success">
+                                    Generate Bill
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="6" class="text-muted">
+                        No upcoming appointments found.
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

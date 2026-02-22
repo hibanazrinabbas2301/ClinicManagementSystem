@@ -84,10 +84,11 @@ namespace ClinicManagementSystem.Repositories
             cmd.Parameters.AddWithValue("@Quantity", model.Quantity);
             cmd.Parameters.AddWithValue("@Dosage", model.Dosage ?? "");
 
-            cmd.Parameters.AddWithValue("@Frequency", model.Frequency ?? "");
+            cmd.Parameters.AddWithValue("@Frequency", model.Frequency);
             cmd.Parameters.AddWithValue("@DurationDays", model.DurationDays);
 
             con.Open();
+            //throw new Exception("AppointmentId sent to SQL: " + model.AppointmentId);
             cmd.ExecuteNonQuery();
         }
 
@@ -115,7 +116,7 @@ namespace ClinicManagementSystem.Repositories
                     Quantity = Convert.ToInt32(dr["Quantity"]),
                     Dosage = dr["Dosage"].ToString(),             // ✅ Add
 
-                    Frequency = dr["Frequency"].ToString(),
+                    Frequency = Convert.ToInt32(dr["Frequency"]),
                     DurationDays = Convert.ToInt32(dr["DurationDays"])
                 });
             }
@@ -305,7 +306,7 @@ namespace ClinicManagementSystem.Repositories
                     MedicineName = dr["MedicineName"].ToString(),
                     Dosage = dr["Dosage"].ToString(),
                     Quantity = Convert.ToInt32(dr["Quantity"]),
-                    Frequency = dr["Frequency"].ToString(),
+                    Frequency = Convert.ToInt32(dr["Frequency"]),
                     DurationDays = Convert.ToInt32(dr["DurationDays"])
                 });
             }
@@ -428,6 +429,24 @@ namespace ClinicManagementSystem.Repositories
 
             con.Open();
             cmd.ExecuteNonQuery();
+        }
+        // =====================================================
+        // ✅ Get Medicine Stock
+        // =====================================================
+        public int GetMedicineStock(int medicineId)
+        {
+            using SqlConnection con = new SqlConnection(_ConnectionString);
+
+            SqlCommand cmd = new SqlCommand(
+    "SELECT Quantity FROM Medicine WHERE MedicineId = @MedicineId", con);
+
+            cmd.Parameters.AddWithValue("@MedicineId", medicineId);
+
+            con.Open();
+
+            object result = cmd.ExecuteScalar();
+
+            return result == null ? 0 : Convert.ToInt32(result);
         }
     }
 }

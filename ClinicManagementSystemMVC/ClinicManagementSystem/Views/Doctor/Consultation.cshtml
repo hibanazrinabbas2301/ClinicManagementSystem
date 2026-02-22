@@ -131,6 +131,9 @@
     <!-- ============================= -->
     <!-- 💊 Medicines -->
     <!-- ============================= -->
+    <!-- ============================= -->
+    <!-- 💊 Medicines -->
+    <!-- ============================= -->
     <div class="col-md-6 mb-4">
         <div class="card shadow-sm border-0 rounded-4 h-100">
             <div class="card-header bg-primary text-white rounded-top-4">
@@ -144,37 +147,50 @@
                     <input type="hidden" name="AppointmentId" value="@Model.AppointmentId" />
                     <input type="hidden" name="PatientId" value="@Model.PatientId" />
 
+                    <!-- Medicine Dropdown -->
                     <div class="mb-3">
                         <label class="fw-semibold">Select Medicine</label>
                         <select name="MedicineId" class="form-select" required>
-                            <option value="">-- Select Medicine --</option>
+                            <option value="0">-- Select Medicine --</option>
                             @foreach (var med in ViewBag.Medicines)
                             {
-                                <option value="@med.MedicineId">@med.MedicineName</option>
+                                <option value="@med.MedicineId">
+                                    @med.MedicineName
+                                </option>
                             }
                         </select>
                     </div>
 
-                    <div class="mb-3">
-                        <label class="fw-semibold">Quantity</label>
-                        <input type="number" name="Quantity" class="form-control" min="1" required />
-                    </div>
+                    <!-- Dosage -->
                     <div class="mb-3">
                         <label class="fw-semibold">Dosage</label>
-                        <input type="text" name="Dosage"
+                        <input type="text"
+                               name="Dosage"
                                class="form-control"
-                               placeholder="Eg: 500mg / 10ml" required />
+                               placeholder="Eg: 500mg / 10ml"
+                               required />
                     </div>
 
+                    <!-- Frequency Dropdown -->
                     <div class="mb-3">
-                        <label class="fw-semibold">Frequency</label>
-                        <input type="text" name="Frequency" class="form-control"
-                               placeholder="Eg: Morning & Night" required />
+                        <label class="fw-semibold">Frequency (Times Per Day)</label>
+                        <select name="Frequency" class="form-select" required>
+                            <option value="0">-- Select Frequency --</option>
+                            <option value="1">Once Daily</option>
+                            <option value="2">Twice Daily</option>
+                            <option value="3">Three Times Daily</option>
+                            <option value="4">Four Times Daily</option>
+                        </select>
                     </div>
 
+                    <!-- Duration -->
                     <div class="mb-3">
                         <label class="fw-semibold">Duration (Days)</label>
-                        <input type="number" name="DurationDays" class="form-control" min="1" required />
+                        <input type="number"
+                               name="DurationDays"
+                               class="form-control"
+                               min="1"
+                               required />
                     </div>
 
                     <button class="btn btn-primary w-100 shadow-sm">
@@ -208,7 +224,7 @@
                                     <td>@m.MedicineName</td>
                                     <td>@m.Quantity</td>
                                     <td>@m.Dosage</td>
-                                    <td>@m.Frequency</td>
+                                    <td>@m.Frequency Times/Day</td>
                                     <td>@m.DurationDays</td>
                                 </tr>
                             }

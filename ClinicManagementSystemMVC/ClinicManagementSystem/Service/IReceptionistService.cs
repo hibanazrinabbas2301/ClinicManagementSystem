@@ -27,7 +27,10 @@ namespace ClinicManagementSystem.Services
         List<SlotViewModel> GetAvailableSlots();
         List<SlotViewModel> GetAvailableDoctorSlots(DateTime slotDate);
         void SendConsultationBillEmail(int appointmentId, string email);
+        List<AppointmentViewModel> GetTodaysAppointments();
+        List<AppointmentViewModel> GetUpcomingAppointments();
 
+        List<AppointmentViewModel> SearchAppointments(string searchText, string type);
 
     }
 }

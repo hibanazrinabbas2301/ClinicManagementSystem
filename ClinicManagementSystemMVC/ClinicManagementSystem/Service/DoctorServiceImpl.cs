@@ -1,6 +1,7 @@
 ﻿using ClinicManagementSystem.Models;
 using ClinicManagementSystem.Repositories;
 using ClinicManagementSystem.View_Model;
+using ClinicManagementSystem.ViewModel;
 
 namespace ClinicManagementSystem.Services
 {
@@ -35,9 +36,35 @@ namespace ClinicManagementSystem.Services
             return _repo.GetMedicines();
         }
 
-        public void AddMedicinePrescription(MedicinePrescription model)
+        public void AddMedicinePrescription(PrescriptionDetailViewModel model)
         {
-            _repo.AddMedicinePrescription(model);
+            // 1️⃣ Calculate Quantity
+            int requiredQuantity = model.Frequency * model.DurationDays;
+
+            // 2️⃣ Get Available Stock
+            int availableStock = _repo.GetMedicineStock(model.MedicineId);
+
+            // 3️⃣ Check Stock
+            if (availableStock < requiredQuantity)
+            {
+                throw new Exception("Not enough stock available for this medicine.");
+            }
+
+            // 4️⃣ Convert ViewModel → Entity Model
+            MedicinePrescription prescription = new MedicinePrescription
+            {
+                AppointmentId = model.AppointmentId,   // 🔥 THIS WAS MISSING
+                PatientId = model.PatientId,           // 🔥 THIS WAS MISSING
+                DoctorId = model.DoctorId,             // 🔥 THIS WAS MISSING
+                MedicineId = model.MedicineId,
+                Quantity = requiredQuantity,
+                Dosage = model.Dosage,
+                Frequency = model.Frequency,
+                DurationDays = model.DurationDays
+            };
+
+            // 5️⃣ Save Prescription
+            _repo.AddMedicinePrescription(prescription);
         }
 
         public List<MedicinePrescription> GetMedicinesByAppointment(int appointmentId)

@@ -1,5 +1,6 @@
 ﻿using ClinicManagementSystem.Models;
 using ClinicManagementSystem.View_Model;
+using ClinicManagementSystem.ViewModel;
 
 namespace ClinicManagementSystem.Services
 {
@@ -22,7 +23,8 @@ namespace ClinicManagementSystem.Services
         // Medicine Prescription
         // ===============================
         List<Medicine> GetMedicines();
-        void AddMedicinePrescription(MedicinePrescription model);
+        //void AddMedicinePrescription(MedicinePrescription model);
+        void AddMedicinePrescription(PrescriptionDetailViewModel model);
         List<MedicinePrescription> GetMedicinesByAppointment(int appointmentId);
 
         // ===============================

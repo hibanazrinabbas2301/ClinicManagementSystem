@@ -6,6 +6,7 @@
     var phone = Context.Request.Query["phone"].ToString();
     var genderList = new List<string> { "Male", "Female", "Other" };
 }
+
 <div class="mb-3">
     <a href="@Url.Action("Index", "Receptionist")" class="btn btn-outline-secondary">
         <i class="bi bi-arrow-left"></i> Dashboard
@@ -13,6 +14,13 @@
 </div>
 
 <h2 class="mb-4 text-center">Patients List</h2>
+
+@if (TempData["PatientUpdateSuccess"] != null)
+{
+    <div class="alert alert-success text-center">
+        @TempData["PatientUpdateSuccess"]
+    </div>
+}
 
 <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
     <!-- Search form -->
@@ -28,7 +36,7 @@
     </button>
 </div>
 
-<!-- Add Patient Modal -->
+<!-- ===================== ADD PATIENT MODAL ===================== -->
 <div class="modal fade" id="addPatientModal" tabindex="-1" aria-labelledby="addPatientModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -43,14 +51,18 @@
                         <label class="form-label">MMR No</label>
                         <input type="text" name="MMRNo" class="form-control" required />
                     </div>
+
                     <div class="mb-3">
                         <label class="form-label">Name</label>
                         <input type="text" name="PatientName" class="form-control" required />
                     </div>
+
                     <div class="mb-3">
                         <label class="form-label">Gender</label>
-                        @Html.DropDownList("Gender", new SelectList(genderList), "-- Select Gender --", new { @class = "form-select", required = "required" })
+                        @Html.DropDownList("Gender", new SelectList(genderList), "-- Select Gender --",
+                        new { @class = "form-select", required = "required" })
                     </div>
+
                     <div class="mb-3">
                         <label class="form-label">Date of Birth</label>
                         <input type="date" name="DOB" class="form-control" required min="1950-01-01"
@@ -83,6 +95,7 @@
                         <textarea name="Address" class="form-control" rows="2" maxlength="200"></textarea>
                     </div>
                 </div>
+
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                     <button type="submit" class="btn btn-primary">Add Patient</button>
@@ -112,7 +125,7 @@
 
             let isValid = true;
 
-            // --- Phone validation ---
+            // Phone validation
             if (!phonePattern.test(phone)) {
                 phoneError.textContent = "Phone number must contain exactly 10 digits.";
                 isValid = false;
@@ -129,7 +142,7 @@
                 phoneError.textContent = "";
             }
 
-            // --- Blood group validation ---
+            // Blood group validation
             if (!bloodPattern.test(blood)) {
                 bloodError.textContent = "Enter valid blood group (A+, A-, B+, B-, AB+, AB-, O+, O-)";
                 isValid = false;
@@ -137,14 +150,12 @@
                 bloodError.textContent = "";
             }
 
-            // --- Prevent form submission if invalid ---
-            if (!isValid) {
-                event.preventDefault();
-            }
+            if (!isValid) event.preventDefault();
         });
     });
 </script>
 
+<!-- ===================== PATIENTS TABLE ===================== -->
 <table class="table table-bordered table-striped">
     <thead class="table-light text-center">
         <tr>
@@ -155,10 +166,10 @@
             <th>Phone</th>
             <th>Address</th>
             <th>Blood Group</th>
-            <th>Status</th>
-            @*<th>Actions</th>*@
+            <th style="width: 260px;">Actions</th>
         </tr>
     </thead>
+
     <tbody>
         @if (Model != null && Model.Any())
         {
@@ -172,63 +183,92 @@
                     <td>@patient.ContactNumber</td>
                     <td>@patient.Address</td>
                     <td>@patient.BloodGroup</td>
-                    <td>
-                        <span class="badge @(patient.Status == "Active" ? "bg-success" : "bg-secondary")">@patient.Status</span>
-                    </td>
+
+                    <!-- ✅ ONLY ONE actions cell (Create Appointment + Edit) -->
                     <td class="text-center">
-                        <!-- Edit Patient Button -->
-                        <button class="btn btn-sm btn-warning mb-1" data-bs-toggle="modal" data-bs-target="#editPatientModal_@patient.PatientId">
+
+                        <!-- Create Appointment -->
+                        <a class="btn btn-sm btn-primary mb-1"
+                           asp-action="TodayAppointments"
+                           asp-controller="Receptionist"
+                           asp-route-patientId="@patient.PatientId"
+                           asp-route-slotDate="@DateTime.Today.ToString("yyyy-MM-dd")">
+                            <i class="bi bi-calendar-plus"></i> Create Appointment
+                        </a>
+
+                        <!-- ✅ Edit (ONLY Phone + Address editable) -->
+                        <button type="button"
+                                class="btn btn-sm btn-warning mb-1"
+                                data-bs-toggle="modal"
+                                data-bs-target="#editPatientModal_@patient.PatientId">
                             <i class="bi bi-pencil-square"></i> Edit
                         </button>
 
-
-                        @*
-                        <!-- Delete Patient Form -->
-                        <form asp-action="DeletePatient" asp-controller="Receptionist" method="post" class="d-inline">
-                            @Html.AntiForgeryToken()
-                            <input type="hidden" name="id" value="@patient.PatientId" />
-                            <button type="submit" class="btn btn-sm btn-danger mb-1" onclick="return confirm('Are you sure you want to delete this patient?');">
-                                <i class="bi bi-trash"></i> Delete
-                            </button>
-                        </form>*@
-
-                        <!-- Edit Patient Modal -->
-                        <div class="modal fade" id="editPatientModal_@patient.PatientId" tabindex="-1" aria-labelledby="editPatientModalLabel_@patient.PatientId" aria-hidden="true">
+                        <!-- ===================== EDIT MODAL ===================== -->
+                        <div class="modal fade"
+                             id="editPatientModal_@patient.PatientId"
+                             tabindex="-1"
+                             aria-labelledby="editPatientModalLabel_@patient.PatientId"
+                             aria-hidden="true">
                             <div class="modal-dialog">
                                 <div class="modal-content">
-                                    <form id="editPatientForm_@patient.PatientId" asp-action="EditPatient" asp-controller="Receptionist" method="post">
+
+                                    <!-- ✅ IMPORTANT:
+                                         This action should update ONLY phone + address in controller.
+                                         If your action name is different, change asp-action. -->
+                                    <form id="editPatientForm_@patient.PatientId"
+                                          asp-action="EditPatientContact"
+                                          asp-controller="Receptionist"
+                                          method="post">
                                         @Html.AntiForgeryToken()
-                                        <input type="hidden" name="PatientId" value="@patient.PatientId" />
+
+                                        <input type="hidden" name="patientId" value="@patient.PatientId" />
+
                                         <div class="modal-header">
-                                            <h5 class="modal-title" id="editPatientModalLabel_@patient.PatientId">Edit Patient</h5>
+                                            <h5 class="modal-title" id="editPatientModalLabel_@patient.PatientId">
+                                                Edit Contact Details
+                                            </h5>
                                             <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                         </div>
+
                                         <div class="modal-body">
 
-                                            <div asp-validation-summary="All" class="text-danger mb-2"></div> <!-- Validation summary for server-side errors -->
+                                            <div asp-validation-summary="All" class="text-danger mb-2"></div>
 
+                                            <!-- READONLY FIELDS -->
                                             <div class="mb-3">
                                                 <label class="form-label">MMR No</label>
-                                                <input type="text" name="MMRNo" class="form-control" value="@patient.MMRNo" required />
-                                            </div>
-                                            <div class="mb-3">
-                                                <label class="form-label">Name</label>
-                                                <input type="text" name="PatientName" class="form-control" value="@patient.PatientName" required />
-                                            </div>
-                                            <div class="mb-3">
-                                                <label class="form-label">Gender</label>
-                                                @Html.DropDownList("Gender", new SelectList(genderList, patient.Gender), "-- Select Gender --", new { @class = "form-select", required = "required" })
-                                            </div>
-                                            <div class="mb-3">
-                                                <label class="form-label">Date of Birth</label>
-                                                <input type="date" name="DOB" class="form-control" required min="1950-01-01"
-                                                       max="@DateTime.Now.ToString("yyyy-MM-dd")" />
+                                                <input type="text" class="form-control" value="@patient.MMRNo" readonly />
                                             </div>
 
-                                            <!-- Phone -->
+                                            <div class="mb-3">
+                                                <label class="form-label">Name</label>
+                                                <input type="text" class="form-control" value="@patient.PatientName" readonly />
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <label class="form-label">Gender</label>
+                                                <input type="text" class="form-control" value="@patient.Gender" readonly />
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <label class="form-label">Date of Birth</label>
+                                                <input type="text" class="form-control"
+                                                       value="@(patient.DOB != DateTime.MinValue ? patient.DOB.ToString("dd/MM/yyyy") : "")"
+                                                       readonly />
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <label class="form-label">Blood Group</label>
+                                                <input type="text" class="form-control" value="@patient.BloodGroup" readonly />
+                                            </div>
+
+                                            <!-- ✅ EDITABLE: Phone -->
                                             <div class="mb-3">
                                                 <label class="form-label">Phone</label>
-                                                <input type="text" id="ContactNumber_@patient.PatientId" name="ContactNumber"
+                                                <input type="text"
+                                                       id="ContactNumber_@patient.PatientId"
+                                                       name="phone"
                                                        class="form-control"
                                                        required minlength="10" maxlength="10"
                                                        pattern="[0-9]{10}"
@@ -237,52 +277,44 @@
                                                 <small id="phoneError_@patient.PatientId" class="text-danger"></small>
                                             </div>
 
-                                            <!-- Blood Group -->
-                                            <div class="mb-3">
-                                                <label class="form-label">Blood Group</label>
-                                                <input type="text" id="BloodGroup_@patient.PatientId" name="BloodGroup"
-                                                       class="form-control"
-                                                       required
-                                                       value="@patient.BloodGroup"
-                                                       title="Enter a valid blood group (A+, A-, B+, B-, AB+, AB-, O+, O-)" />
-                                                <small id="bloodError_@patient.PatientId" class="text-danger"></small>
-                                            </div>
-
+                                            <!-- ✅ EDITABLE: Address -->
                                             <div class="mb-3">
                                                 <label class="form-label">Address</label>
-                                                <textarea name="Address" class="form-control" rows="2" maxlength="200">@patient.Address</textarea>
+                                                <textarea name="address"
+                                                  class="form-control"
+                                                  rows="2"
+                                                  maxlength="200"
+                                                  required>@patient.Address</textarea>
                                             </div>
+
                                         </div>
+
                                         <div class="modal-footer">
                                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                            <button type="submit" class="btn btn-primary">Update Patient</button>
+                                            <button type="submit" class="btn btn-primary">Update</button>
                                         </div>
                                     </form>
+
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Validation Script for Edit Modal -->
+                        <!-- Phone validation script for edit modal -->
                         <script>
                             document.addEventListener("DOMContentLoaded", function () {
                                 const form = document.getElementById("editPatientForm_@patient.PatientId");
                                 const phoneInput = document.getElementById("ContactNumber_@patient.PatientId");
-                                const bloodInput = document.getElementById("BloodGroup_@patient.PatientId");
                                 const phoneError = document.getElementById("phoneError_@patient.PatientId");
-                                const bloodError = document.getElementById("bloodError_@patient.PatientId");
+
+                                if (!form || !phoneInput) return;
 
                                 form.addEventListener("submit", function (event) {
                                     const phone = phoneInput.value.trim();
-                                    const blood = bloodInput.value.trim().toUpperCase();
-                                    bloodInput.value = blood;
 
                                     const phonePattern = /^[0-9]{10}$/;
                                     const sequential = "1234567890";
-                                    const bloodPattern = /^(A|B|AB|O)[+-]$/i;
-
                                     let isValid = true;
 
-                                    // --- Phone validation ---
                                     if (!phonePattern.test(phone)) {
                                         phoneError.textContent = "Phone number must contain exactly 10 digits.";
                                         isValid = false;
@@ -299,20 +331,11 @@
                                         phoneError.textContent = "";
                                     }
 
-                                    // --- Blood group validation ---
-                                    if (!bloodPattern.test(blood)) {
-                                        bloodError.textContent = "Enter valid blood group (A+, A-, B+, B-, AB+, AB-, O+, O-)";
-                                        isValid = false;
-                                    } else {
-                                        bloodError.textContent = "";
-                                    }
-
-                                    if (!isValid) {
-                                        event.preventDefault();
-                                    }
+                                    if (!isValid) event.preventDefault();
                                 });
                             });
                         </script>
+
                     </td>
                 </tr>
             }
@@ -320,7 +343,7 @@
         else
         {
             <tr>
-                <td colspan="9" class="text-center text-muted">No patients found.</td>
+                <td colspan="8" class="text-center text-muted">No patients found.</td>
             </tr>
         }
     </tbody>

@@ -9,7 +9,7 @@
         public int MedicineId { get; set; }
         public int Quantity { get; set; }
 
-        public string Frequency { get; set; }
+        public int Frequency { get; set; }
 
         public string Dosage { get; set; }
 

@@ -10,9 +10,13 @@
 
         public int Quantity { get; set; }
 
-        public string Frequency { get; set; }
+        public int Frequency { get; set; }
 
         public int DurationDays { get; set; }
+        public int AppointmentId { get; set; }
+        public int PatientId { get; set; }
+        public int DoctorId { get; set; }
+        public string Dosage { get; set; }
     }
 
 }

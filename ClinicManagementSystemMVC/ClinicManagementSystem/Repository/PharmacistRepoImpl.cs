@@ -212,7 +212,7 @@ namespace ClinicManagementSystem.Repositories
                                 MedicineId = Convert.ToInt32(reader["MedicineId"]),
                                 MedicineName = reader["MedicineName"].ToString(),
                                 Quantity = Convert.ToInt32(reader["Quantity"]),
-                                Frequency = reader["Frequency"].ToString(),
+                                Frequency = Convert.ToInt32(reader["Frequency"]),
                                 DurationDays = Convert.ToInt32(reader["DurationDays"])
                             });
                         }

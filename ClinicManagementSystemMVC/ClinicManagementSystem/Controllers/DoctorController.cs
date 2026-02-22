@@ -1,7 +1,9 @@
 ﻿using ClinicManagementSystem.Models;
 using ClinicManagementSystem.Security;
 using ClinicManagementSystem.Services;
+using ClinicManagementSystem.ViewModel;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace ClinicManagementSystem.Controllers
 {
@@ -58,14 +60,23 @@ namespace ClinicManagementSystem.Controllers
             Diagnosis model = _service.GetDiagnosisByAppointment(appointmentId);
 
             // If no diagnosis exists yet → create empty model
-            if (model.AppointmentId == 0)
-            {
-                model = new Diagnosis()
-                {
-                    AppointmentId = appointmentId,
-                    PatientId = patientId
-                };
-            }
+            //if (model.AppointmentId == 0)
+            //{
+            //    model = new Diagnosis()
+            //    {
+            //        AppointmentId = appointmentId,
+            //        PatientId = patientId
+            //    };
+            //}
+            model.AppointmentId = appointmentId;
+            model.PatientId = patientId;
+            ViewBag.FrequencyList = new List<SelectListItem>
+{
+    new SelectListItem { Text = "Once Daily", Value = "1" },
+    new SelectListItem { Text = "Twice Daily", Value = "2" },
+    new SelectListItem { Text = "Three Times Daily", Value = "3" },
+    new SelectListItem { Text = "Four Times Daily", Value = "4" }
+};
 
             return View(model);
         }
@@ -97,25 +108,62 @@ namespace ClinicManagementSystem.Controllers
         // ✅ 4. Add Medicine (Multiple Allowed)
         // ===============================
         [HttpPost]
-        public IActionResult AddMedicinePrescription(MedicinePrescription model)
+        public IActionResult AddMedicinePrescription(
+    [FromForm] int AppointmentId,
+    [FromForm] int PatientId,
+    [FromForm] int MedicineId,
+    [FromForm] string Dosage,
+    [FromForm] int Frequency,
+    [FromForm] int DurationDays)
         {
-            if (model.MedicineId == 0 || model.Quantity <= 0 || string.IsNullOrEmpty(model.Dosage))
+            if (AppointmentId <= 0)
             {
-                TempData["Error"] = "⚠ Please select medicine, quantity and dosage!";
-                return RedirectToAction("Consultation",
-                    new { appointmentId = model.AppointmentId, patientId = model.PatientId });
+                TempData["Error"] = "Invalid Appointment ID: " + AppointmentId;
+                return RedirectToAction("Index");
             }
 
-
-            model.DoctorId = Convert.ToInt32(HttpContext.Session.GetInt32("DoctorId"));
+            var model = new PrescriptionDetailViewModel
+            {
+                AppointmentId = AppointmentId,
+                PatientId = PatientId,
+                DoctorId = Convert.ToInt32(HttpContext.Session.GetInt32("DoctorId")),
+                MedicineId = MedicineId,
+                Dosage = Dosage,
+                Frequency = Frequency,
+                DurationDays = DurationDays
+            };
 
             _service.AddMedicinePrescription(model);
 
-            TempData["Success"] = "💊 Medicine Added Successfully!";
-
             return RedirectToAction("Consultation",
-                new { appointmentId = model.AppointmentId, patientId = model.PatientId });
+                new { appointmentId = AppointmentId, patientId = PatientId });
         }
+
+        //    try
+        //    {
+        //        var model = new PrescriptionDetailViewModel
+        //        {
+        //            AppointmentId = AppointmentId,
+        //            PatientId = PatientId,
+        //            DoctorId = Convert.ToInt32(HttpContext.Session.GetInt32("DoctorId")),
+        //            MedicineId = MedicineId,
+        //            Dosage = Dosage,
+        //            Frequency = Frequency,
+        //            DurationDays = DurationDays
+        //        };
+
+        //        _service.AddMedicinePrescription(model);
+
+        //        TempData["Success"] = "💊 Medicine added successfully!";
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        TempData["Error"] = ex.Message;
+        //    }
+
+        //    return RedirectToAction("Consultation",
+        //        new { appointmentId = AppointmentId, patientId = PatientId });
+        //}
 
         // ===============================
         // ✅ 5. Add Lab Test (Multiple Allowed)
