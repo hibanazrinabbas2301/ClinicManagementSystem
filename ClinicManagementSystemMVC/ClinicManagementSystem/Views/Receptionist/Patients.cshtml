@@ -66,6 +66,35 @@
 
     </div>
 </div>
+<!-- ===================== ADD PATIENT MODAL ===================== --> 
+<div class="modal fade" id="addPatientModal" tabindex="-1" aria-labelledby="addPatientModalLabel" aria-hidden="true">
+    
+<div class="modal-dialog"> 
+    <div class="modal-content"> 
+        <form id="addPatientForm" asp-action="AddPatient" asp-controller="Receptionist" method="post">
+            @Html.AntiForgeryToken() 
+            <div class="modal-header"> 
+                <h5 class="modal-title" id="addPatientModalLabel">Add New Patient</h5> 
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button> 
+                </div> <div class="modal-body"> <div class="mb-3"> <label class="form-label">MMR No</label> 
+                    <input type="text" name="MMRNo" class="form-control" required /> </div> <div class="mb-3"> 
+                        <label class="form-label">Name</label> <input type="text" name="PatientName" class="form-control" required /> 
+                        </div> <div class="mb-3"> <label class="form-label">Gender</label>
+                            @Html.DropDownList("Gender", new SelectList(genderList), "-- Select Gender --", 
+                            new { @class = "form-select", required = "required" }) </div> <div class="mb-3"> 
+                                <label class="form-label">Date of Birth</label> 
+                                <input type="date" name="DOB" class="form-control" required min="1950-01-01" max="@DateTime.Now.ToString("yyyy-MM-dd")" />
+                                </div> 
+                                <!-- Phone Validation --> <div class="mb-3"> <label class="form-label">Phone</label>
+                                    <input type="text" id="ContactNumber" name="ContactNumber" class="form-control" required minlength="10" maxlength="10" pattern="[0-9]{10}" title="Enter a valid 10-digit phone number" /> 
+                                    <small id="phoneError" class="text-danger"></small> </div> 
+                                    <!-- Blood Group Validation --> <div class="mb-3">
+                                        <label class="form-label">Blood Group</label> <input type="text" id="BloodGroup" name="BloodGroup" class="form-control" required title="Enter a valid blood group (A+, A-, B+, B-, AB+, AB-, O+, O-)" />
+                                        <small id="bloodError" class="text-danger"></small> </div> <div class="mb-3"> <label class="form-label">Address</label> <textarea name="Address" class="form-control" rows="2" maxlength="200"></textarea>
+                                            </div> </div> <div class="modal-footer"> <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button> <button type="submit" class="btn btn-primary">Add Patient</button> 
+                                                </div> </form> </div> </div> </div> 
+                                                <!-- Add Patient Validation Script --> 
+                                                <script> document.addEventListener("DOMContentLoaded", function () { const form = document.getElementById("addPatientForm"); const phoneInput = document.getElementById("ContactNumber"); const bloodInput = document.getElementById("BloodGroup"); const phoneError = document.getElementById("phoneError"); const bloodError = document.getElementById("bloodError"); form.addEventListener("submit", function (event) { const phone = phoneInput.value.trim(); const blood = bloodInput.value.trim().toUpperCase(); bloodInput.value = blood; const phonePattern = /^[0-9]{10}$/; const sequential = "1234567890"; const bloodPattern = /^(A|B|AB|O)[+-]$/i; let isValid = true; // Phone validation if (!phonePattern.test(phone)) { phoneError.textContent = "Phone number must contain exactly 10 digits."; isValid = false; } else if (/^(\d)\1{9}$/.test(phone)) { phoneError.textContent = "Phone number cannot be all same digits."; isValid = false; } else if (phone === sequential) { phoneError.textContent = "Sequential numbers like 1234567890 are not allowed."; isValid = false; } else if (phone.startsWith("0")) { phoneError.textContent = "Phone number cannot start with 0."; isValid = false; } else { phoneError.textContent = ""; } // Blood group validation if (!bloodPattern.test(blood)) { bloodError.textContent = "Enter valid blood group (A+, A-, B+, B-, AB+, AB-, O+, O-)"; isValid = false; } else { bloodError.textContent = ""; } if (!isValid) event.preventDefault(); }); }); </script>
 
 <!-- ================= PATIENT TABLE CARD ================= -->
 <div class="card shadow-sm">

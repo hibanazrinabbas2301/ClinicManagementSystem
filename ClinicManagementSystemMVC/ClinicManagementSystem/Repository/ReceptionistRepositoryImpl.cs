@@ -283,12 +283,17 @@ namespace ClinicManagementSystem.Repositories
                     {
                         appointments.Add(new AppointmentViewModel
                         {
-                            AppointmentId = reader["AppointmentId"] != DBNull.Value ? Convert.ToInt32(reader["AppointmentId"]) : 0,
-                            PatientId = reader["PatientId"] != DBNull.Value ? Convert.ToInt32(reader["PatientId"]) : 0,
-                            TokenNumber = reader["TokenNumber"] != DBNull.Value ? Convert.ToInt32(reader["TokenNumber"]) : 0,
+                            AppointmentId = Convert.ToInt32(reader["AppointmentId"]),
+                            PatientId = Convert.ToInt32(reader["PatientId"]),
+                            TokenNumber = reader["TokenNumber"] == DBNull.Value ? 0 : Convert.ToInt32(reader["TokenNumber"]),
                             PatientName = reader["PatientName"].ToString(),
                             DoctorName = reader["DoctorName"].ToString(),
-                            AppointmentDate = Convert.ToDateTime(reader["SlotDate"]),
+
+                            // ✅ THESE THREE WERE MISSING
+                            SlotDate = Convert.ToDateTime(reader["SlotDate"]),
+                            StartTime = (TimeSpan)reader["StartTime"],
+                            EndTime = (TimeSpan)reader["EndTime"],
+
                             Status = reader["Status"].ToString()
                         });
                     }
@@ -458,13 +463,15 @@ namespace ClinicManagementSystem.Repositories
                             DoctorId = Convert.ToInt32(dr["DoctorId"]),
                             DoctorName = dr["DoctorName"].ToString(),
                             SlotId = Convert.ToInt32(dr["SlotId"]),
-                            SlotDate = Convert.ToDateTime(dr["SlotDate"]),
+                            SlotDate = dr["SlotDate"] == DBNull.Value
+    ? DateTime.MinValue
+    : Convert.ToDateTime(dr["SlotDate"]),
                             StartTime = TimeSpan.Parse(dr["StartTime"].ToString()),
                             EndTime = TimeSpan.Parse(dr["EndTime"].ToString()),
                             TokenNumber = dr["TokenNumber"] == DBNull.Value ? 0 : Convert.ToInt32(dr["TokenNumber"]),
                             Status = dr["Status"].ToString(),
                             ConsultationBill = dr["ConsultationBill"] == DBNull.Value ? 0 : Convert.ToDecimal(dr["ConsultationBill"]),
-                            AppointmentDate = Convert.ToDateTime(dr["AppointmentDate"])
+                            //AppointmentDate = Convert.ToDateTime(dr["SlotDate"])
                         });
                     }
                 }
@@ -501,7 +508,7 @@ namespace ClinicManagementSystem.Repositories
                             TokenNumber = dr["TokenNumber"] == DBNull.Value ? 0 : Convert.ToInt32(dr["TokenNumber"]),
                             Status = dr["Status"].ToString(),
                             ConsultationBill = dr["ConsultationBill"] == DBNull.Value ? 0 : Convert.ToDecimal(dr["ConsultationBill"]),
-                            AppointmentDate = Convert.ToDateTime(dr["AppointmentDate"])
+                            AppointmentDate = Convert.ToDateTime(dr["SlotDate"])
                         });
                     }
                 }
@@ -540,7 +547,7 @@ namespace ClinicManagementSystem.Repositories
                             TokenNumber = dr["TokenNumber"] == DBNull.Value ? null : (int?)Convert.ToInt32(dr["TokenNumber"]),
                             Status = dr["Status"].ToString(),
                             ConsultationBill = dr["ConsultationBill"] == DBNull.Value ? 0 : Convert.ToDecimal(dr["ConsultationBill"]),
-                            AppointmentDate = Convert.ToDateTime(dr["AppointmentDate"]),
+                            AppointmentDate = Convert.ToDateTime(dr["SlotDate"]),
                             MMRNo = dr["MMRNo"].ToString()
                         });
                     }

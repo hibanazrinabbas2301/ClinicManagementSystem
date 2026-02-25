@@ -13,10 +13,10 @@ namespace ClinicManagementSystem.Controllers
             _logger = logger;
         }
 
-        public IActionResult Dashboard()
+        public IActionResult Index()
         {
-            if (HttpContext.Session.GetString("UserName") == null)
-                return RedirectToAction("Index", "Login");
+            //if (HttpContext.Session.GetString("UserName") == null)
+            //    return RedirectToAction("Index", "Login");
 
             return View();
         }

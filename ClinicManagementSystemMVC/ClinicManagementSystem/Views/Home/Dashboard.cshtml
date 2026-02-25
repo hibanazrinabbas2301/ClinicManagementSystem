@@ -1,4 +1,4 @@
-﻿@{
+﻿@* @{
     ViewData["Title"] = "Dashboard";
 
     var role = Context.Session.GetString("UserRole");
@@ -68,8 +68,8 @@
                 <p class="text-muted mb-4">
                     Manage medicines and prescriptions
                 </p>
-                <a asp-controller="Pharmacist"
-                   asp-action="Dashboard"
+                <a asp-controller="Home"
+                   asp-action="Index"
                    class="btn btn-primary w-100">
                     Go to Pharmacy
                 </a>
@@ -138,4 +138,4 @@
         </div>
     </div>
 
-</div>
+</div> *@
